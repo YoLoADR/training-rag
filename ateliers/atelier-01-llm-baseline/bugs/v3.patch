@@ -1,0 +1,25 @@
+--- a/ateliers/atelier-01-llm-baseline/script_system.py	2026-05-23 19:33:15
++++ b/ateliers/atelier-01-llm-baseline/script_system.py	2026-05-23 19:33:15
+@@ -1,13 +1,7 @@
+ """Script de base Atelier 01 avec system prompt (version de référence pour Bug Hunt v3)."""
+-from langchain_core.messages import HumanMessage, SystemMessage
++from langchain_core.messages import HumanMessage
+ from homebutler.llm.provider import get_llm
+ 
+-SYSTEM_PROMPT = (
+-    "Tu es un assistant maison HomeButler. "
+-    "Tu aides les locataires avec leurs questions sur leur logement. "
+-    "Si tu ne disposes pas des informations privées du logement, "
+-    "réponds poliment que tu n'as pas accès à ces données."
+-)
+ 
+ QUESTIONS_LOGEMENT = [
+     "Quelle est la marque de ma chaudière ?",
+@@ -22,7 +16,6 @@
+     print("\n═══ Run — avec system prompt ═══")
+     for i, q in enumerate(QUESTIONS_LOGEMENT, 1):
+         response = llm.invoke([
+-            SystemMessage(content=SYSTEM_PROMPT),
+             HumanMessage(content=q),
+         ])
+         print(f"\n[{i}] {q}")

@@ -1,0 +1,16 @@
+--- a/homebutler/agent/tools.py
++++ b/homebutler/agent/tools.py
+@@ -23,11 +23,7 @@ def _search_home_docs(query: str) -> str:
+
+ search_docs_tool = Tool(
+     name="search_home_docs",
+     func=_search_home_docs,
+-    description=(
+-        "Recherche dans les documents du logement : bail, règlement de copropriété, "
+-        "notices d'équipements (chaudière, VMC, lave-linge), DPE. "
+-        "Utilise cet outil pour toute question sur le fonctionnement d'un équipement, "
+-        "les droits et obligations, ou les caractéristiques du logement. "
+-        "Input : question ou mots-clés en français."
+-    ),
++    description="cherche des documents",
+ )

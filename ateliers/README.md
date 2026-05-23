@@ -34,20 +34,40 @@ python -c "import homebutler; print('Package HomeButler OK')"
 python ateliers/atelier-02-rag-simple/exercice.py
 ```
 
+## Comment démarrer — point d'entrée élève
+
+**Le point d'entrée élève est `GUIDE-ELEVE.md`**, pas `README-formateur.md` (réservé aux formateurs).
+
+Avant le premier atelier, faire l'**Atelier 00 Pré-vol** (`atelier-00-prevol/GUIDE-ELEVE.md`) pour préparer l'environnement une fois pour toutes.
+
 ## Structure d'un atelier
 
 ```
 ateliers/atelier-0X-nom/
-├── README.md          ← instructions, questions de réflexion, contexte
-├── exercice.py        ← TODOs à compléter par l'élève
-└── solution.py        ← version corrigée + commentaires pédagogiques
+├── GUIDE-ELEVE.md            ← 📖 Point d'entrée élève — mission + indices + Bug Hunt
+├── README-formateur.md       ← instructions formateur (contexte, débrief)
+├── exercice.py               ← squelette à compléter (TODOs)
+├── .claude/
+│   ├── CLAUDE.md             ← scope strict pour Claude Code / Cursor
+│   └── settings.json         ← hook UserPromptSubmit (anti-scope-leak)
+├── .cursorrules              ← équivalent scope strict pour Cursor
+├── bugs/
+│   ├── v1.patch              ← bug à appliquer (git apply)
+│   ├── test_v1.py            ← test qui ÉCHOUE avec le bug, PASSE une fois réparé
+│   └── v1_explanation.md     ← QCM vrai/faux sur la cause racine
+└── checkpoints/
+    ├── check_1.py            ← QCM auto-corrigé intermédiaire
+    └── check_final.py        ← QCM auto-corrigé final (décide Sprint vs Bonus)
 ```
 
+La `solution.py` est disponible sur la branche `solution/at0X` (non checkoutée par défaut).
+
 Certains ateliers ont des fichiers supplémentaires :
-- `evaluate_rag.py` (02) — métriques RAGAs
-- `gradio_demo.py` (03) — interface chat
+- `evaluate_rag.py` (02) — métriques Recall@k, faithfulness
+- `gradio_demo.py` (03) — interface chat (Bonus)
 - `prepare_dataset.py` / `explore_dataset.py` (04) — dataset FT
 - `test_securite.sh` / `checklist.md` (05) — sécurité, déploiement
+- `evaluate_pipeline.py` / `grille_decision.md` (06) — benchmark comparatif
 - `evaluate_pipeline.py` / `grille_decision.md` (06) — comparaison RAG vs FT
 
 ## Mapping formation → ateliers

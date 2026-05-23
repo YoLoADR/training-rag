@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "(EnsembleRetriever|chroma|agent|react|tool.call|fine.tun|lora|finetun)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'SCOPE GUARD: Requête hors-scope détectée pour l\\'atelier 02. Répondre uniquement en scope (chunking, FAISS, embeddings, similarity vs MMR, recall@k).'"
+          }
+        ]
+      }
+    ]
+  }
+}

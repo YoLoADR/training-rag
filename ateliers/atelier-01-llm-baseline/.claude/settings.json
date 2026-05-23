@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "(RAG|retriev|FAISS|embed|chunk|agent|react|tool.call|fine.tun|lora|finetun)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'SCOPE GUARD: Requête hors-scope détectée pour l\\'atelier 01. Répondre uniquement en scope (LLM, prompt, temperature, top_p, seed, few-shot, max_tokens).'"
+          }
+        ]
+      }
+    ]
+  }
+}
