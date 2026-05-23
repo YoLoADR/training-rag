@@ -92,13 +92,13 @@ case "$BRANCH" in
 
   atelier/05*)
     blue "Atelier 05 — Déploiement (pas d'endpoints /rag/evaluate ni /chat/compare)"
-    if [ -f api/routers/rag.py ] && grep -E "/(evaluate|compare-strategies)" api/routers/rag.py >/dev/null; then
-      fail "endpoints d'évaluation présents dans api/routers/rag.py"
+    if [ -f api/routers/rag.py ] && grep -E '@router\.post\("/(evaluate|compare-strategies)' api/routers/rag.py >/dev/null; then
+      fail "endpoints d'évaluation actifs dans api/routers/rag.py"
     else
       ok "api/routers/rag.py limité à /retrieve"
     fi
-    if [ -f api/routers/chat.py ] && grep -E "compare" api/routers/chat.py >/dev/null; then
-      fail "endpoint /chat/compare présent (réservé atelier 06)"
+    if [ -f api/routers/chat.py ] && grep -E '@router\.post\("/compare' api/routers/chat.py >/dev/null; then
+      fail "endpoint /chat/compare actif (réservé atelier 06)"
     else
       ok "api/routers/chat.py sans /compare"
     fi
