@@ -23,16 +23,32 @@ fail() { red "  ✗ $1"; ERRORS=$((ERRORS+1)); }
 ok()   { green "  ✓ $1"; }
 
 forbid_dir() {
-  if [ -d "$1" ]; then fail "Répertoire interdit présent : $1"; else ok "absent : $1"; fi
+  # Vérifie qu'aucun fichier tracké par git n'existe sous ce chemin.
+  # Ignore donc les __pycache__ ou autres artefacts laissés par d'autres branches.
+  if git ls-files --error-unmatch "$1" >/dev/null 2>&1 || \
+     [ -n "$(git ls-files "$1" 2>/dev/null)" ]; then
+    fail "Répertoire interdit (fichiers trackés) : $1"
+  else
+    ok "absent : $1"
+  fi
 }
 
 forbid_file() {
-  if [ -f "$1" ]; then fail "Fichier interdit présent : $1"; else ok "absent : $1"; fi
+  if git ls-files --error-unmatch "$1" >/dev/null 2>&1; then
+    fail "Fichier interdit présent : $1"
+  else
+    ok "absent : $1"
+  fi
 }
 
 forbid_grep() {
   # $1 = motif regex, $2 = chemin
-  if grep -RIl --include='*.py' -E "$1" "$2" >/dev/null 2>&1; then
+  TRACKED=$(git ls-files "$2" 2>/dev/null | grep -E '\.py$')
+  if [ -z "$TRACKED" ]; then
+    ok "$2 vide (aucun .py tracké)"
+    return
+  fi
+  if echo "$TRACKED" | xargs grep -l -E "$1" 2>/dev/null | grep -q .; then
     fail "Motif interdit trouvé '$1' dans $2"
   else
     ok "$2 propre de '$1'"
