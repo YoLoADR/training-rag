@@ -1,0 +1,13 @@
+--- ateliers/atelier-02-rag-simple/solution.py	2026-05-23 17:39:26
++++ /tmp/buggy_at02_v2.py	2026-05-23 19:38:31
+@@ -69,8 +69,8 @@
+     # Semantic (SemanticChunker)             → coupe sur rupture de cohérence
+     # Recommandé par défaut : recursive.
+     # ═══════════════════════════════════════════════════════════════════
+-    chunks_fixed = chunk_fixed_size(pages, chunk_size=512, chunk_overlap=50)
+-    chunks_rec   = chunk_recursive(pages, chunk_size=512, chunk_overlap=50)
++    chunks_fixed = chunk_fixed_size(pages, chunk_size=512, chunk_overlap=0)
++    chunks_rec   = chunk_recursive(pages, chunk_size=512, chunk_overlap=0)
+     print(f"  chunks_fixed     : {len(chunks_fixed)}")
+     print(f"  chunks_recursive : {len(chunks_rec)}")
+ 
