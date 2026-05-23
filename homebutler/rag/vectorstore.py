@@ -1,7 +1,7 @@
 """
 Compatibilité (atelier 02 — FAISS only).
 Réexporte les helpers FAISS depuis vectorstore_faiss.py.
-ChromaDB est introduit à l'atelier 03.
+Le second backend (filtres métadonnées) est introduit à l'atelier 03.
 """
 
 from homebutler.rag.vectorstore_faiss import (
