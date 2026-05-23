@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "(fastapi|streamlit|RAFT|raft|deploiement|déploiement|compare.strateg|eval.comparat)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'SCOPE GUARD: Requête hors-scope détectée pour l\\'atelier 04. Répondre uniquement en scope (LoRA, QLoRA, dataset Alpaca, hyperparamètres, perplexité).'"
+          }
+        ]
+      }
+    ]
+  }
+}

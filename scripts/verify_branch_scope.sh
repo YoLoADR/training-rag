@@ -107,21 +107,33 @@ case "$BRANCH" in
     ;;
 
   atelier/05*)
-    blue "Atelier 05 — Déploiement (pas d'endpoints /rag/evaluate ni /chat/compare)"
-    if [ -f api/routers/rag.py ] && grep -E '@router\.post\("/(evaluate|compare-strategies)' api/routers/rag.py >/dev/null; then
-      fail "endpoints d'évaluation actifs dans api/routers/rag.py"
+    blue "Atelier 05 — Déploiement (routes comparaison désactivées via feature flag)"
+    # Depuis le refactor feature-flag, les routes /evaluate et /compare restent dans le code
+    # mais sont protégées par ENABLE_COMPARE_ROUTES. Vérifier que le flag est bien à false par défaut.
+    if [ -f api/routers/rag.py ] && grep -E '_ENABLE_COMPARE\s*=.*"false"' api/routers/rag.py >/dev/null; then
+      ok "api/routers/rag.py — feature flag ENABLE_COMPARE_ROUTES par défaut à false"
     else
-      ok "api/routers/rag.py limité à /retrieve"
+      fail "ENABLE_COMPARE_ROUTES manquant ou mal configuré dans api/routers/rag.py"
     fi
-    if [ -f api/routers/chat.py ] && grep -E '@router\.post\("/compare' api/routers/chat.py >/dev/null; then
-      fail "endpoint /chat/compare actif (réservé atelier 06)"
+    if [ -f .env ] && grep -E "^ENABLE_COMPARE_ROUTES=true" .env >/dev/null; then
+      fail ".env active ENABLE_COMPARE_ROUTES=true — interdit pour l'atelier 05"
     else
-      ok "api/routers/chat.py sans /compare"
+      ok ".env n'active pas ENABLE_COMPARE_ROUTES (attendu)"
     fi
     ;;
 
   atelier/06*|main)
     blue "Atelier 06 / main — version complète, pas de vérification anti-débordement"
+    if [ -f .env ] && grep -E "^ENABLE_COMPARE_ROUTES=true" .env >/dev/null; then
+      ok ".env active ENABLE_COMPARE_ROUTES=true (requis pour At.06)"
+    else
+      fail ".env n'active pas ENABLE_COMPARE_ROUTES=true — les routes /evaluate et /compare seront en 404"
+    fi
+    ;;
+
+  solution/*)
+    blue "Branche solution — lecture seule, pas de vérification scope"
+    ok "Branche solution : accès réservé post-atelier"
     ;;
 
   *)
@@ -129,6 +141,37 @@ case "$BRANCH" in
     exit 2
     ;;
 esac
+
+# ── Vérification transversale : fichiers prompt-guard présents ────────────────
+blue "─────────────────────────────────────────────────────────"
+blue "Vérification prompt-guard (.claude/CLAUDE.md + .cursorrules par atelier)"
+
+check_atelier_guard() {
+  local dir="$1"
+  local n="$2"
+  if [ -f "${dir}/.claude/CLAUDE.md" ]; then
+    ok "At.${n} — .claude/CLAUDE.md présent"
+  else
+    fail "At.${n} — .claude/CLAUDE.md MANQUANT dans ${dir}/"
+  fi
+  if [ -f "${dir}/.cursorrules" ]; then
+    ok "At.${n} — .cursorrules présent"
+  else
+    fail "At.${n} — .cursorrules MANQUANT dans ${dir}/"
+  fi
+  if [ -f "${dir}/.claude/settings.json" ]; then
+    ok "At.${n} — .claude/settings.json présent"
+  else
+    fail "At.${n} — .claude/settings.json MANQUANT dans ${dir}/"
+  fi
+}
+
+for atelier_dir in ateliers/atelier-0[0-9]-*/; do
+  if [ -d "$atelier_dir" ]; then
+    n=$(echo "$atelier_dir" | grep -o 'atelier-[0-9][0-9]' | grep -o '[0-9][0-9]')
+    check_atelier_guard "$atelier_dir" "$n"
+  fi
+done
 
 blue "─────────────────────────────────────────────────────────"
 if [ "$ERRORS" -eq 0 ]; then

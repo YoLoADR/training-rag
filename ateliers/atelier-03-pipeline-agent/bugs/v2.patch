@@ -1,0 +1,30 @@
+--- a/homebutler/agent/tools.py
++++ b/homebutler/agent/tools.py
+@@ -129,7 +129,49 @@ get_weather_tool = Tool(
+ # ── Liste complète des outils ─────────────────────────────────────────────────
+
++# Outils fictifs supplementaires (bug : trop d'outils -> confusion)
++from langchain.tools import Tool as _T
++
++_dummy_tools = [
++    _T(name="check_heating_schedule", func=lambda x: "schedule: 7h-22h", description="Verifie le planning de chauffage"),
++    _T(name="get_water_pressure", func=lambda x: "3.2 bar", description="Mesure la pression de l'eau"),
++    _T(name="list_parking_spots", func=lambda x: "Place B3", description="Liste les places de parking"),
++    _T(name="read_electricity_meter", func=lambda x: "12345 kWh", description="Lit le compteur electrique"),
++    _T(name="check_mail_box", func=lambda x: "2 lettres", description="Verifie la boite aux lettres"),
++    _T(name="get_building_rules", func=lambda x: "Silence 22h-7h", description="Regles de l'immeuble"),
++    _T(name="find_nearest_pharmacy", func=lambda x: "Pharmacie du Parc, 300m", description="Trouve la pharmacie"),
++    _T(name="check_elevator_status", func=lambda x: "En service", description="Statut ascenseur"),
++    _T(name="get_garbage_schedule", func=lambda x: "Mardi et vendredi", description="Calendrier poubelles"),
++    _T(name="list_emergency_contacts", func=lambda x: "Pompiers: 18", description="Contacts urgence"),
++    _T(name="check_internet_speed", func=lambda x: "500 Mbps", description="Vitesse internet"),
++    _T(name="get_noise_level", func=lambda x: "42 dB", description="Niveau sonore"),
++]
++
+ ALL_TOOLS = [
+     search_docs_tool,
+     analyze_energy_tool,
+     find_products_tool,
+     get_weather_tool,
++    *_dummy_tools,
+ ]

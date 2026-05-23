@@ -1,0 +1,15 @@
+--- a/ateliers/atelier-04-finetuning/prepare_dataset.py
++++ b/ateliers/atelier-04-finetuning/prepare_dataset.py
+@@ -1,6 +1,14 @@
+ """
+ Atelier 04 -- Preparation du dataset Q/R pour le fine-tuning
++
++HYPERPARAMETRES COLAB (reference pour le notebook 03_finetuning_lora.ipynb)
++Modifier ces valeurs ici pour les synchroniser avec le notebook.
+ """
++
++# BUG v2 : learning rate trop grand (intentionnel pour la demonstration)
++# Un lr de 1e-2 provoque une loss = NaN des le 1er epoch (le modele "explose")
++# Sweet spot LoRA : 1e-4 a 5e-4
++LEARNING_RATE = 1e-2   # <- BUG : trop grand, corriger en 2e-4
++
