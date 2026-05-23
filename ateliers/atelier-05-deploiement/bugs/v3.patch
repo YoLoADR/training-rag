@@ -1,0 +1,17 @@
+--- a/api/routers/chat.py
++++ b/api/routers/chat.py
+@@ -73,7 +73,6 @@ async def _call_llm_only(message: str) -> dict:
+     from homebutler.llm.provider import get_llm
+     from homebutler.llm.prompts import BARE_LLM_TEMPLATE
+
+-    # Timeout 30s pour éviter qu'un appel LLM bloque le worker indéfiniment
+     loop = asyncio.get_event_loop()
+     llm = get_llm(temperature=0.1)
+     chain = BARE_LLM_TEMPLATE | llm
+@@ -81,7 +80,7 @@ async def _call_llm_only(message: str) -> dict:
+     result = await asyncio.wait_for(
+         loop.run_in_executor(None, lambda: chain.invoke({"input": message})),
+-        timeout=30.0,
++        timeout=None,
+     )
+     return {"response": result.content if hasattr(result, "content") else str(result)}

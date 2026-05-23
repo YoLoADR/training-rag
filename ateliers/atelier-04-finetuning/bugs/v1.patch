@@ -1,0 +1,18 @@
+--- a/ateliers/atelier-04-finetuning/prepare_dataset.py
++++ b/ateliers/atelier-04-finetuning/prepare_dataset.py
+@@ -40,10 +40,8 @@ def categorize(pair: dict) -> str:
+     """Classifie une paire par mot-cle dans la question (heuristique simple)."""
+     q = pair["input"].lower()
+     if any(k in q for k in ("chaudiere", "radiateur", "vmc", "lave-linge", "frigo", "chauffe-eau")):
+-        return "equipements"
++        return "autres"
+     if any(k in q for k in ("bail", "loyer", "preavis", "caution", "syndic", "copropriete", "droits")):
+-        return "droits"
++        return "autres"
+     if any(k in q for k in ("consommation", "energie", "kwh", "facture", "dpe", "electricite")):
+-        return "energie"
++        return "autres"
+     if any(k in q for k in ("producteur", "artisan", "plombier", "legumes", "marketplace", "boulanger")):
+-        return "marketplace"
++        return "autres"
+     return "autres"

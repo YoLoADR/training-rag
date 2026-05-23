@@ -1,0 +1,18 @@
+--- a/homebutler/agent/react_agent.py
++++ b/homebutler/agent/react_agent.py
+@@ -1,6 +1,6 @@
+ """
+ Agent ReAct HomeButler.
+-Parametres cles : max_iterations=8, handle_parsing_errors=True
++ATTENTION : max_iterations retire intentionnellement (bug v3)
+ """
+
+
+@@ -20,7 +20,6 @@ def build_agent_executor(tools, llm, memory=None):
+         agent=agent,
+         tools=tools,
+         verbose=True,
+-        max_iterations=8,
+         handle_parsing_errors=True,
+         return_intermediate_steps=True,
+         memory=memory,

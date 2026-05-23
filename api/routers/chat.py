@@ -1,13 +1,13 @@
 """
-Router /chat — HomeButler AI (atelier 05 : sans /compare)
+Router /chat — HomeButler AI
 Endpoints :
   POST /chat          — 3 modes : agent | rag_only | llm_only
-  GET  /chat/stream   — SSE streaming token par token
-
-Note : POST /chat/compare est introduit en atelier 06.
+  POST /chat/compare  — même question dans les 3 modes (J3 TP comparaison)
+  GET  /chat/stream   — SSE streaming token par token (J3 déploiement)
 """
 
 import asyncio
+import os
 from typing import Literal
 
 from fastapi import APIRouter, HTTPException, Request
@@ -16,6 +16,9 @@ from pydantic import BaseModel, Field
 from api.limiter import limiter
 
 router = APIRouter(prefix="/chat", tags=["chat"])
+
+# Atelier 05 scope guard — route comparaison réservée à l'atelier 06
+_ENABLE_COMPARE = os.getenv("ENABLE_COMPARE_ROUTES", "false").lower() == "true"
 
 
 # ── Modèles Pydantic ──────────────────────────────────────────────────────────
@@ -168,6 +171,38 @@ async def chat(request: Request, req: ChatRequest):
         token_usage=data.get("token_usage"),
         steps=data.get("steps", []),
     )
+
+
+# ── POST /chat/compare ────────────────────────────────────────────────────────
+
+@router.post("/compare", include_in_schema=_ENABLE_COMPARE)
+async def chat_compare(req: ChatRequest):
+    """
+    Lance la même question dans les 3 modes en parallèle.
+    Démo pédagogique centrale J3 : évaluation comparative LLM seul vs RAG vs agent.
+    Correspond à la grille de décision (draft.md) : LLM seul → hallucine | RAG → factuel | agent → orchestré.
+    Réservée à l'atelier 06 — activer ENABLE_COMPARE_ROUTES=true dans .env
+    """
+    if not _ENABLE_COMPARE:
+        raise HTTPException(status_code=404, detail="Route réservée à l'atelier 06. Définir ENABLE_COMPARE_ROUTES=true dans .env")
+    from homebutler import config
+
+    try:
+        llm_result, rag_result, agent_result = await asyncio.gather(
+            _call_llm_only(req.message),
+            _call_rag_only(req.message),
+            _call_agent(req.message, f"compare-{req.session_id}", debug=True),
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur compare : {str(e)}")
+
+    return {
+        "question": req.message,
+        "llm_provider": config.LLM_PROVIDER,
+        "llm_only": llm_result,
+        "rag_only": rag_result,
+        "agent": agent_result,
+    }
 
 
 # ── GET /chat/stream ──────────────────────────────────────────────────────────

@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "(fine.tun|lora|finetun|fastapi|streamlit|RAFT|raft|deploiement|déploiement)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'SCOPE GUARD: Requête hors-scope détectée pour l\\'atelier 03. Répondre uniquement en scope (EnsembleRetriever, ReAct, tools, mémoire conversationnelle).'"
+          }
+        ]
+      }
+    ]
+  }
+}

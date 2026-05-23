@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "(RAFT|raft|eval.comparat|compare.strateg|fine.tun|lora|at06|atelier.06)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'SCOPE GUARD: Requête hors-scope détectée pour l\\'atelier 05. Répondre uniquement en scope (FastAPI, Streamlit, sécurité, Langfuse, rate limit).'"
+          }
+        ]
+      }
+    ]
+  }
+}

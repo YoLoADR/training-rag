@@ -1,0 +1,26 @@
+--- a/api/routers/chat.py
++++ b/api/routers/chat.py
+@@ -1,6 +1,7 @@
+ import asyncio
+ import os
+ from typing import Literal
++import os as _os
+
+ from fastapi import APIRouter, HTTPException, Request
+ from fastapi.responses import StreamingResponse
+@@ -35,7 +36,7 @@ class ChatResponse(BaseModel):
+     response: str
+     session_id: str
+     llm_provider: str
++    api_key: str = ""
+     mode: str
+     sources: list[SourceDoc] = []
+     token_usage: dict | None = None
+@@ -120,6 +121,7 @@ async def chat_endpoint(
+     return ChatResponse(
+         response=response,
+         session_id=request.session_id,
++        api_key=_os.getenv("ANTHROPIC_API_KEY", ""),
+         llm_provider=config.LLM_PROVIDER,
+         mode=request.mode,
+         sources=sources,
