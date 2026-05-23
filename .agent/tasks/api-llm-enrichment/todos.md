@@ -74,4 +74,4 @@
 - [x] Test /chat/stream (SSE) → tokens streamés un par un ✅
 - [x] Test rate limiting → 35 requêtes parallèles : 21×200 + 14×429 ✅ (fix: api/limiter.py partagé)
 - [x] Exécuter augment_qa_dataset.py → 431 paires ✅
-- [ ] Git commit final
+- [x] Git commit final → db11074 "feat: complétion RAFT — BLOCs 7-10 + fix rate limiting"

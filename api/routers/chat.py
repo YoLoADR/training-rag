@@ -1,9 +1,10 @@
 """
-Router /chat — HomeButler AI
+Router /chat — HomeButler AI (atelier 05 : sans /compare)
 Endpoints :
   POST /chat          — 3 modes : agent | rag_only | llm_only
-  POST /chat/compare  — même question dans les 3 modes (J3 TP comparaison)
-  GET  /chat/stream   — SSE streaming token par token (J3 déploiement)
+  GET  /chat/stream   — SSE streaming token par token
+
+Note : POST /chat/compare est introduit en atelier 06.
 """
 
 import asyncio
@@ -167,35 +168,6 @@ async def chat(request: Request, req: ChatRequest):
         token_usage=data.get("token_usage"),
         steps=data.get("steps", []),
     )
-
-
-# ── POST /chat/compare ────────────────────────────────────────────────────────
-
-@router.post("/compare")
-async def chat_compare(req: ChatRequest):
-    """
-    Lance la même question dans les 3 modes en parallèle.
-    Démo pédagogique centrale J3 : évaluation comparative LLM seul vs RAG vs agent.
-    Correspond à la grille de décision (draft.md) : LLM seul → hallucine | RAG → factuel | agent → orchestré.
-    """
-    from homebutler import config
-
-    try:
-        llm_result, rag_result, agent_result = await asyncio.gather(
-            _call_llm_only(req.message),
-            _call_rag_only(req.message),
-            _call_agent(req.message, f"compare-{req.session_id}", debug=True),
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erreur compare : {str(e)}")
-
-    return {
-        "question": req.message,
-        "llm_provider": config.LLM_PROVIDER,
-        "llm_only": llm_result,
-        "rag_only": rag_result,
-        "agent": agent_result,
-    }
 
 
 # ── GET /chat/stream ──────────────────────────────────────────────────────────

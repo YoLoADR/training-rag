@@ -6,6 +6,9 @@ L'aspect est donc pédagogiquement creux :  sans mémoire, sans sources, sans mo
 
 ----
 
+Peux-tu aussi tester on doit pouvoir voir les différences entre les approches alternatives et comparer les stratégies ? 
+
+Je souhaite vérfier que cette tache à bien été implémenter . Peux-tu me guider étape par étape, n'hésite pas à preparer des seed si besoin et corrige des qu'il y a une incohérence ou une erreur
 
  ---
   Les scénarios de la formation, expliqués simplement

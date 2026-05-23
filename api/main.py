@@ -128,11 +128,8 @@ async def root():
         "status": "ok",
         "endpoints": {
             "chat": "POST /chat (modes: agent|rag_only|llm_only)",
-            "compare": "POST /chat/compare",
             "stream": "GET /chat/stream",
             "rag_retrieve": "POST /rag/retrieve",
-            "rag_evaluate": "POST /rag/evaluate",
-            "rag_compare": "POST /rag/compare-strategies",
         },
     }
 
