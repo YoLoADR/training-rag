@@ -1,18 +1,20 @@
+diff --git a/homebutler/agent/react_agent.py b/homebutler/agent/react_agent.py
+index e8c07a7..308853d 100644
 --- a/homebutler/agent/react_agent.py
 +++ b/homebutler/agent/react_agent.py
-@@ -1,6 +1,6 @@
+@@ -4,6 +4,7 @@ Agent ReAct HomeButler.
+ - Session memory : ConversationBufferWindowMemory par session_id (k=6 tours).
+ - Debug mode : return_intermediate_steps=True pour exposer la trace Thought/Action.
+ - Tracing : LangSmith (env vars) ou Langfuse (TRACING_PROVIDER=langfuse).
++- ATTENTION : parametre de limite de boucle retire intentionnellement (bug v3)
  """
- Agent ReAct HomeButler.
--Parametres cles : max_iterations=8, handle_parsing_errors=True
-+ATTENTION : max_iterations retire intentionnellement (bug v3)
- """
-
-
-@@ -20,7 +20,6 @@ def build_agent_executor(tools, llm, memory=None):
+ 
+ from langchain import hub
+@@ -90,7 +91,6 @@ def get_agent_executor(
          agent=agent,
-         tools=tools,
-         verbose=True,
+         tools=ALL_TOOLS,
+         verbose=verbose,
 -        max_iterations=8,
          handle_parsing_errors=True,
-         return_intermediate_steps=True,
+         return_intermediate_steps=debug,
          memory=memory,

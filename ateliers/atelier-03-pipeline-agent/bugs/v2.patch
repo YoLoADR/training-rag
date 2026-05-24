@@ -1,8 +1,11 @@
+diff --git a/homebutler/agent/tools.py b/homebutler/agent/tools.py
+index 4403412..927062b 100644
 --- a/homebutler/agent/tools.py
 +++ b/homebutler/agent/tools.py
-@@ -129,7 +129,49 @@ get_weather_tool = Tool(
+@@ -128,9 +128,26 @@ get_weather_tool = Tool(
+ 
  # ── Liste complète des outils ─────────────────────────────────────────────────
-
+ 
 +# Outils fictifs supplementaires (bug : trop d'outils -> confusion)
 +from langchain.tools import Tool as _T
 +
@@ -17,8 +20,6 @@
 +    _T(name="check_elevator_status", func=lambda x: "En service", description="Statut ascenseur"),
 +    _T(name="get_garbage_schedule", func=lambda x: "Mardi et vendredi", description="Calendrier poubelles"),
 +    _T(name="list_emergency_contacts", func=lambda x: "Pompiers: 18", description="Contacts urgence"),
-+    _T(name="check_internet_speed", func=lambda x: "500 Mbps", description="Vitesse internet"),
-+    _T(name="get_noise_level", func=lambda x: "42 dB", description="Niveau sonore"),
 +]
 +
  ALL_TOOLS = [

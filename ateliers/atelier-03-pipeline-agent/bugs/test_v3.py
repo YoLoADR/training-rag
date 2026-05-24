@@ -1,45 +1,36 @@
 """
-Bug v3 -- Agent sans max_iterations.
+Bug v3 -- Agent sans parametre de limite de boucle.
 
 Le test verifie que la configuration de l'AgentExecutor inclut
-un max_iterations raisonnable (<= 15).
+un parametre de limite raisonnable (<= 15).
 
-Sans max_iterations, LangChain utilise sa valeur par defaut (15 en LangChain >=0.2)
-ou peut boucler indefiniment sur certaines versions. Le risque :
+Sans cette limite, LangChain peut boucler indefiniment. Le risque :
   - Boucle infinie si le modele hallucine des observations
   - Cout API explose (centaines d'appels LLM)
   - Timeout cote utilisateur
 
-Ce test inspecte le code de build_agent_executor pour detecter la configuration.
+Ce test inspecte le code source de react_agent.py pour detecter la configuration.
 Lance apres avoir applique v3.patch pour voir l'echec.
 Lance apres correction pour voir le succes.
 """
 
-import ast
-import inspect
+import re
 import pytest
 from pathlib import Path
 
 
-def get_agent_executor_source() -> str:
-    """Retourne le code source de build_agent_executor."""
-    try:
-        from homebutler.agent import react_agent
-        import importlib
-        importlib.reload(react_agent)
-        return inspect.getsource(react_agent.build_agent_executor)
-    except (ImportError, AttributeError):
-        # Lecture directe du fichier si l'import echoue
-        path = Path(__file__).resolve().parent.parent.parent.parent / "homebutler" / "agent" / "react_agent.py"
-        if path.exists():
-            return path.read_text()
-        return ""
+def get_react_agent_source() -> str:
+    """Retourne le code source complet de react_agent.py."""
+    path = Path(__file__).resolve().parent.parent.parent.parent / "homebutler" / "agent" / "react_agent.py"
+    if path.exists():
+        return path.read_text(encoding="utf-8")
+    return ""
 
 
 class TestMaxIterations:
     def test_max_iterations_present_in_source(self):
-        """max_iterations doit etre present dans build_agent_executor."""
-        source = get_agent_executor_source()
+        """max_iterations doit etre present dans get_agent_executor."""
+        source = get_react_agent_source()
         assert "max_iterations" in source, (
             "max_iterations absent de la configuration AgentExecutor.\n"
             "Sans ce parametre, l'agent peut boucler indefiniment.\n"
@@ -48,9 +39,7 @@ class TestMaxIterations:
 
     def test_max_iterations_value_reasonable(self):
         """max_iterations doit etre une valeur raisonnable (entre 2 et 15)."""
-        source = get_agent_executor_source()
-        # Chercher un pattern 'max_iterations=<nombre>'
-        import re
+        source = get_react_agent_source()
         matches = re.findall(r'max_iterations\s*=\s*(\d+)', source)
         if not matches:
             pytest.fail(
@@ -67,7 +56,7 @@ class TestMaxIterations:
 
     def test_handle_parsing_errors_present(self):
         """handle_parsing_errors=True doit etre present (evite les crashs sur format LLM)."""
-        source = get_agent_executor_source()
+        source = get_react_agent_source()
         assert "handle_parsing_errors" in source, (
             "handle_parsing_errors absent.\n"
             "Sans ce parametre, un format de reponse LLM inattendu fait planter l'agent.\n"
