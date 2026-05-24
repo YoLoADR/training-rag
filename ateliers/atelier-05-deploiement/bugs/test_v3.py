@@ -1,50 +1,62 @@
 """
-Bug v3 — Test : l'API doit répondre dans un délai raisonnable (timeout < 30s).
+Bug v3 — Timeout manquant dans asyncio.wait_for (analyse statique).
 
-Applique d'abord le patch : git apply ateliers/atelier-05-deploiement/bugs/v3.patch
-Lance ensuite : pytest ateliers/atelier-05-deploiement/bugs/test_v3.py -v
+Le bug : timeout=None dans asyncio.wait_for() désactive le timeout.
+Un appel LLM bloqué peut immobiliser le worker FastAPI indéfiniment.
 
-Le test ne REUSSIT pas automatiquement avec ce bug (le timeout est None → l'appel
-peut ne jamais revenir). En pratique, ce test vérifie que le code de l'API inclut
-un timeout explicite côté asyncio. Inspecte la source après application du patch.
+Applique le patch : git apply ateliers/atelier-05-deploiement/bugs/v3.patch
+Lance ensuite   : pytest ateliers/atelier-05-deploiement/bugs/test_v3.py -v
 
-Pré-requis : API démarrée sur localhost:8000
+Le test ECHOUE si timeout=None est présent dans chat.py.
+Le test PASSE quand un timeout numérique explicite est défini.
+
+Pas d'appel LLM — analyse statique de api/routers/chat.py.
 """
 
-import httpx
-import pytest
+import pathlib
 
 
-@pytest.mark.asyncio
-async def test_chat_responds_within_timeout():
-    """L'endpoint /chat doit répondre dans les 35 secondes (timeout client)."""
-    async with httpx.AsyncClient(timeout=35.0) as client:
-        try:
-            response = await client.post(
-                "http://localhost:8000/chat",
-                json={"message": "Bonjour, quelle est la marque de ma chaudière ?", "mode": "llm_only"},
-            )
-            # Si on arrive ici, la réponse est arrivée dans les 35s
-            assert response.status_code in (200, 429), (
-                f"Code HTTP inattendu : {response.status_code}"
-            )
-        except httpx.ReadTimeout:
-            pytest.fail(
-                "TIMEOUT : l'API n'a pas répondu dans 35s. "
-                "Vérifie que asyncio.wait_for() a un timeout explicite (ex: 30.0) "
-                "dans _call_llm_only(), _call_rag_only() et _call_agent()."
-            )
+BASE_DIR = pathlib.Path(__file__).resolve().parent.parent.parent.parent
+CHAT_ROUTER = BASE_DIR / "api" / "routers" / "chat.py"
 
 
-def test_timeout_code_present():
-    """Vérifie que le code source contient un timeout explicite dans chat.py."""
-    import pathlib
-    chat_source = pathlib.Path("api/routers/chat.py").read_text()
-    assert "timeout=None" not in chat_source, (
-        "BUG ACTIF : 'timeout=None' trouvé dans api/routers/chat.py. "
-        "Un timeout=None dans asyncio.wait_for() désactive complètement le timeout. "
-        "Remplace par timeout=30.0 (ou une valeur depuis config)."
+def _get_source() -> str:
+    return CHAT_ROUTER.read_text(encoding="utf-8")
+
+
+def test_no_timeout_none():
+    """timeout=None ne doit pas apparaître dans api/routers/chat.py."""
+    source = _get_source()
+
+    assert "timeout=None" not in source, (
+        "BUG ACTIF : 'timeout=None' trouvé dans api/routers/chat.py.\n"
+        "asyncio.wait_for() avec timeout=None ne limite pas la durée d'attente — "
+        "un appel LLM bloqué peut immobiliser le worker indéfiniment.\n"
+        "Remplace par un timeout numérique, par exemple timeout=30.0."
     )
-    assert "wait_for" in chat_source, (
-        "Pas de asyncio.wait_for() trouvé dans chat.py — assure-toi qu'un timeout est bien défini."
+
+
+def test_wait_for_present():
+    """asyncio.wait_for() doit être utilisé dans _call_llm_only."""
+    source = _get_source()
+
+    assert "wait_for" in source, (
+        "asyncio.wait_for() absent de api/routers/chat.py.\n"
+        "Ajoute asyncio.wait_for(..., timeout=30.0) autour de l'appel LLM "
+        "dans _call_llm_only() pour protéger le worker contre les appels bloquants."
+    )
+
+
+def test_timeout_is_numeric():
+    """Le timeout doit être une valeur numérique explicite (pas None, pas absent)."""
+    source = _get_source()
+
+    # Vérifie qu'un timeout numérique est présent (ex: 30.0, 60.0, etc.)
+    import re
+    has_numeric_timeout = bool(
+        re.search(r"timeout=\d+(\.\d+)?", source)
+    )
+    assert has_numeric_timeout, (
+        "Aucun timeout numérique trouvé dans api/routers/chat.py.\n"
+        "asyncio.wait_for() doit avoir un timeout explicite, ex: timeout=30.0."
     )

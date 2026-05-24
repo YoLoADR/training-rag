@@ -1,36 +1,51 @@
 """
-Bug v2 — Test : le header CORS ne doit pas être wildcard (*).
+Bug v2 — CORS wildcard (*) dans api/main.py (analyse statique).
 
-Applique d'abord le patch : git apply ateliers/atelier-05-deploiement/bugs/v2.patch
-Lance ensuite : pytest ateliers/atelier-05-deploiement/bugs/test_v2.py -v
+Le bug : allow_origins=["*"] autorise n'importe quel domaine à appeler l'API,
+ce qui est dangereux en production (CSRF, data exfiltration).
 
-Le test ECHOUE si CORS=* (bug actif).
-Le test PASSE quand tu as restreint les origines à une liste explicite.
+Applique le patch : git apply ateliers/atelier-05-deploiement/bugs/v2.patch
+Lance ensuite   : pytest ateliers/atelier-05-deploiement/bugs/test_v2.py -v
 
-Pré-requis : API démarrée sur localhost:8000
+Le test ECHOUE si allow_origins=["*"] est présent.
+Le test PASSE quand les origines sont restreintes à une liste explicite.
+
+Pas d'appel réseau — analyse statique de api/main.py.
 """
 
-import subprocess
+import pathlib
+
+
+BASE_DIR = pathlib.Path(__file__).resolve().parent.parent.parent.parent
+MAIN_PY = BASE_DIR / "api" / "main.py"
+
+
+def _get_source() -> str:
+    return MAIN_PY.read_text(encoding="utf-8")
 
 
 def test_cors_not_wildcard():
-    """Le header Access-Control-Allow-Origin ne doit pas valoir '*' en prod."""
-    result = subprocess.run(
-        [
-            "curl", "-s", "-I",
-            "-H", "Origin: https://evil-site.example.com",
-            "http://localhost:8000/health",
-        ],
-        capture_output=True,
-        text=True,
-        timeout=10,
-    )
-    headers = result.stdout.lower()
+    """allow_origins ne doit pas être ['*'] dans api/main.py."""
+    source = _get_source()
 
-    # Cherche le header CORS dans la réponse preflight ou simple
-    cors_wildcard = "access-control-allow-origin: *" in headers
-    assert not cors_wildcard, (
-        "BUG ACTIF : le header 'Access-Control-Allow-Origin: *' est présent. "
-        "Restreins allow_origins dans api/main.py à une liste explicite "
-        "ex: ['http://localhost:8501', 'http://localhost:3000']"
+    assert 'allow_origins=["*"]' not in source, (
+        "BUG ACTIF : 'allow_origins=[\"*\"]' trouvé dans api/main.py.\n"
+        "Un CORS wildcard autorise tous les domaines — dangereux en production.\n"
+        "Remplace par une liste explicite :\n"
+        '  allow_origins=["http://localhost:8501", "http://localhost:3000"]'
+    )
+
+
+def test_cors_has_explicit_origins():
+    """allow_origins doit contenir au moins une origine explicite (localhost)."""
+    source = _get_source()
+
+    has_explicit = (
+        "http://localhost:8501" in source
+        or "http://localhost:3000" in source
+    )
+    assert has_explicit, (
+        "Aucune origine localhost explicite trouvée dans api/main.py.\n"
+        "Ajoute au moins 'http://localhost:8501' ou 'http://localhost:3000' "
+        "dans allow_origins du CORSMiddleware."
     )

@@ -1,14 +1,8 @@
+diff --git a/api/routers/chat.py b/api/routers/chat.py
+index 28d32c3..aebe585 100644
 --- a/api/routers/chat.py
 +++ b/api/routers/chat.py
-@@ -1,6 +1,7 @@
- import asyncio
- import os
- from typing import Literal
-+import os as _os
-
- from fastapi import APIRouter, HTTPException, Request
- from fastapi.responses import StreamingResponse
-@@ -35,7 +36,7 @@ class ChatResponse(BaseModel):
+@@ -40,6 +40,7 @@ class ChatResponse(BaseModel):
      response: str
      session_id: str
      llm_provider: str
@@ -16,11 +10,11 @@
      mode: str
      sources: list[SourceDoc] = []
      token_usage: dict | None = None
-@@ -120,6 +121,7 @@ async def chat_endpoint(
-     return ChatResponse(
-         response=response,
-         session_id=request.session_id,
-+        api_key=_os.getenv("ANTHROPIC_API_KEY", ""),
+@@ -170,6 +171,7 @@ async def chat(request: Request, req: ChatRequest):
+         response=data["response"],
+         session_id=req.session_id,
          llm_provider=config.LLM_PROVIDER,
-         mode=request.mode,
-         sources=sources,
++        api_key=os.getenv("ANTHROPIC_API_KEY", ""),
+         mode=req.mode,
+         sources=[SourceDoc(**s) for s in data.get("sources", [])],
+         token_usage=data.get("token_usage"),

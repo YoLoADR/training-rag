@@ -1,10 +1,13 @@
+diff --git a/api/main.py b/api/main.py
+index d17b7c7..2e2eab9 100644
 --- a/api/main.py
 +++ b/api/main.py
-@@ -83,7 +83,7 @@ app.add_middleware(
+@@ -82,7 +82,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+ # CORS — permissif pour le développement (à restreindre en production)
+ app.add_middleware(
      CORSMiddleware,
 -    allow_origins=["http://localhost:8501", "http://localhost:3000"],
 +    allow_origins=["*"],
      allow_credentials=True,
      allow_methods=["*"],
      allow_headers=["*"],
- )

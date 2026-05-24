@@ -75,10 +75,14 @@ async def _call_llm_only(message: str) -> dict:
     from homebutler.llm.provider import get_llm
     from homebutler.llm.prompts import BARE_LLM_TEMPLATE
 
+    # Timeout 30s pour éviter qu'un appel LLM bloque le worker indéfiniment
     loop = asyncio.get_event_loop()
     llm = get_llm(temperature=0.1)
     chain = BARE_LLM_TEMPLATE | llm
-    result = await loop.run_in_executor(None, chain.invoke, {"question": message})
+    result = await asyncio.wait_for(
+        loop.run_in_executor(None, lambda: chain.invoke({"question": message})),
+        timeout=30.0,
+    )
     return {
         "response": result.content,
         "token_usage": _extract_token_usage(result),

@@ -1,17 +1,13 @@
+diff --git a/api/routers/chat.py b/api/routers/chat.py
+index 28d32c3..222e3c6 100644
 --- a/api/routers/chat.py
 +++ b/api/routers/chat.py
-@@ -73,7 +73,6 @@ async def _call_llm_only(message: str) -> dict:
-     from homebutler.llm.provider import get_llm
-     from homebutler.llm.prompts import BARE_LLM_TEMPLATE
-
--    # Timeout 30s pour éviter qu'un appel LLM bloque le worker indéfiniment
-     loop = asyncio.get_event_loop()
-     llm = get_llm(temperature=0.1)
+@@ -81,7 +81,7 @@ async def _call_llm_only(message: str) -> dict:
      chain = BARE_LLM_TEMPLATE | llm
-@@ -81,7 +80,7 @@ async def _call_llm_only(message: str) -> dict:
      result = await asyncio.wait_for(
-         loop.run_in_executor(None, lambda: chain.invoke({"input": message})),
+         loop.run_in_executor(None, lambda: chain.invoke({"question": message})),
 -        timeout=30.0,
 +        timeout=None,
      )
-     return {"response": result.content if hasattr(result, "content") else str(result)}
+     return {
+         "response": result.content,
