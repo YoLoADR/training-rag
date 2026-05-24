@@ -1,16 +1,15 @@
+diff --git a/ateliers/atelier-04-finetuning/prepare_dataset.py b/ateliers/atelier-04-finetuning/prepare_dataset.py
+index 0de6b23..0289d2f 100644
 --- a/ateliers/atelier-04-finetuning/prepare_dataset.py
 +++ b/ateliers/atelier-04-finetuning/prepare_dataset.py
-@@ -74,12 +74,12 @@ def split_train_val_test(pairs: list[dict], seed: int = 42):
-     rng = random.Random(seed)
+@@ -76,8 +76,8 @@ def split_train_val_test(pairs: list[dict], seed: int = 42):
      shuffled = pairs[:]
      rng.shuffle(shuffled)
      n = len(shuffled)
 -    n_train = int(n * 0.8)
 -    n_val   = int(n * 0.1)
-+    n_train = n       # BUG v3 : tout dans train, zero val, zero test
++    n_train = n
 +    n_val   = 0
      return (
          shuffled[:n_train],
          shuffled[n_train : n_train + n_val],
-         shuffled[n_train + n_val :],
-     )

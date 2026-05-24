@@ -1,18 +1,22 @@
+diff --git a/ateliers/atelier-04-finetuning/prepare_dataset.py b/ateliers/atelier-04-finetuning/prepare_dataset.py
+index 0de6b23..bf66027 100644
 --- a/ateliers/atelier-04-finetuning/prepare_dataset.py
 +++ b/ateliers/atelier-04-finetuning/prepare_dataset.py
-@@ -40,10 +40,8 @@ def categorize(pair: dict) -> str:
-     """Classifie une paire par mot-cle dans la question (heuristique simple)."""
+@@ -41,13 +41,13 @@ def categorize(pair: dict) -> str:
+     """Classifie une paire par mot-clé dans la question (heuristique simple)."""
      q = pair["input"].lower()
-     if any(k in q for k in ("chaudiere", "radiateur", "vmc", "lave-linge", "frigo", "chauffe-eau")):
--        return "equipements"
+     if any(k in q for k in ("chaudière", "radiateur", "vmc", "lave-linge", "frigo", "chauffe-eau")):
+-        return "équipements"
 +        return "autres"
-     if any(k in q for k in ("bail", "loyer", "preavis", "caution", "syndic", "copropriete", "droits")):
+     if any(k in q for k in ("bail", "loyer", "préavis", "caution", "syndic", "copropriété", "droits")):
 -        return "droits"
 +        return "autres"
-     if any(k in q for k in ("consommation", "energie", "kwh", "facture", "dpe", "electricite")):
--        return "energie"
+     if any(k in q for k in ("consommation", "énergie", "kwh", "facture", "dpe", "électricité")):
+-        return "énergie"
 +        return "autres"
-     if any(k in q for k in ("producteur", "artisan", "plombier", "legumes", "marketplace", "boulanger")):
+     if any(k in q for k in ("producteur", "artisan", "plombier", "légumes", "marketplace", "boulanger")):
 -        return "marketplace"
 +        return "autres"
      return "autres"
+ 
+ 

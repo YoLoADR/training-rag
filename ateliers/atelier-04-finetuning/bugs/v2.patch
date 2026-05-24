@@ -1,15 +1,25 @@
+diff --git a/ateliers/atelier-04-finetuning/prepare_dataset.py b/ateliers/atelier-04-finetuning/prepare_dataset.py
+index 0de6b23..79e15be 100644
 --- a/ateliers/atelier-04-finetuning/prepare_dataset.py
 +++ b/ateliers/atelier-04-finetuning/prepare_dataset.py
-@@ -1,6 +1,14 @@
+@@ -1,16 +1,10 @@
  """
- Atelier 04 -- Preparation du dataset Q/R pour le fine-tuning
-+
-+HYPERPARAMETRES COLAB (reference pour le notebook 03_finetuning_lora.ipynb)
-+Modifier ces valeurs ici pour les synchroniser avec le notebook.
+-═══════════════════════════════════════════════════════════════════════════
+-Atelier 04 — Préparation du dataset Q/R pour le fine-tuning
+-═══════════════════════════════════════════════════════════════════════════
+-
+-Génère le dataset, vérifie le format Alpaca, montre un split 80/10/10.
+-
+-Pré-requis : pandas, numpy (déjà dans requirements_atelier04.txt).
+-
+-Lancer : python ateliers/atelier-04-finetuning/prepare_dataset.py
+-═══════════════════════════════════════════════════════════════════════════
++Atelier 04 -- Preparation du dataset Q/R pour le fine-tuning
  """
-+
+ 
 +# BUG v2 : learning rate trop grand (intentionnel pour la demonstration)
-+# Un lr de 1e-2 provoque une loss = NaN des le 1er epoch (le modele "explose")
-+# Sweet spot LoRA : 1e-4 a 5e-4
-+LEARNING_RATE = 1e-2   # <- BUG : trop grand, corriger en 2e-4
++LEARNING_RATE = 1e-2
 +
+ import json
+ import os
+ import random
