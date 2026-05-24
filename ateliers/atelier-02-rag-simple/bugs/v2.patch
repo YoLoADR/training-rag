@@ -1,6 +1,8 @@
---- ateliers/atelier-02-rag-simple/solution.py	2026-05-23 17:39:26
-+++ /tmp/buggy_at02_v2.py	2026-05-23 19:38:31
-@@ -69,8 +69,8 @@
+diff --git a/ateliers/atelier-02-rag-simple/solution.py b/ateliers/atelier-02-rag-simple/solution.py
+index cb1c397..19b3573 100644
+--- a/ateliers/atelier-02-rag-simple/solution.py
++++ b/ateliers/atelier-02-rag-simple/solution.py
+@@ -69,8 +69,8 @@ def main() -> None:
      # Semantic (SemanticChunker)             → coupe sur rupture de cohérence
      # Recommandé par défaut : recursive.
      # ═══════════════════════════════════════════════════════════════════
