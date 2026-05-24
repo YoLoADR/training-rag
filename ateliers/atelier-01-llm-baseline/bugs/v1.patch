@@ -1,6 +1,8 @@
---- ateliers/atelier-01-llm-baseline/solution.py	2026-05-23 12:50:08
-+++ /tmp/buggy_v1_sol.py	2026-05-23 19:32:39
-@@ -41,7 +41,7 @@
+diff --git a/ateliers/atelier-01-llm-baseline/solution.py b/ateliers/atelier-01-llm-baseline/solution.py
+index 82df6fb..0f062c6 100644
+--- a/ateliers/atelier-01-llm-baseline/solution.py
++++ b/ateliers/atelier-01-llm-baseline/solution.py
+@@ -41,7 +41,7 @@ QUESTIONS_LOGEMENT = [
  # ═══════════════════════════════════════════════════════════════════════════
  def run_1_baseline_temperature_basse() -> None:
      """Exécution déterministe : temperature=0.1 → réponses très stables."""

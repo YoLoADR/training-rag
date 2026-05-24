@@ -1,6 +1,8 @@
---- ateliers/atelier-01-llm-baseline/solution.py	2026-05-23 12:50:08
-+++ /tmp/buggy_v2_sol.py	2026-05-23 19:32:45
-@@ -41,7 +41,7 @@
+diff --git a/ateliers/atelier-01-llm-baseline/solution.py b/ateliers/atelier-01-llm-baseline/solution.py
+index 82df6fb..5b0a16f 100644
+--- a/ateliers/atelier-01-llm-baseline/solution.py
++++ b/ateliers/atelier-01-llm-baseline/solution.py
+@@ -41,7 +41,7 @@ QUESTIONS_LOGEMENT = [
  # ═══════════════════════════════════════════════════════════════════════════
  def run_1_baseline_temperature_basse() -> None:
      """Exécution déterministe : temperature=0.1 → réponses très stables."""
@@ -9,7 +11,7 @@
      print(f"\n═══ Run 1 — provider={config.LLM_PROVIDER}, temperature=0.1 ═══")
      for i, q in enumerate(QUESTIONS_LOGEMENT, 1):
          response = llm.invoke([HumanMessage(content=q)])
-@@ -61,7 +61,7 @@
+@@ -61,7 +61,7 @@ def run_1_baseline_temperature_basse() -> None:
  # ═══════════════════════════════════════════════════════════════════════════
  def run_2_comparer_temperatures() -> None:
      """Lance deux fois la même question avec température élevée → variabilité."""
