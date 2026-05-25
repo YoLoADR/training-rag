@@ -90,16 +90,39 @@ def _apply_first_matching_rewrite(q: str) -> str | None:
 
 
 def paraphrase_question(q: str, seed: int = 0) -> list[str]:
-    """Génère jusqu'à 2 variantes de formulation pour une question."""
+    """
+    Génère jusqu'à 2 variantes de formulation pour une question.
+
+    Variante 1 : réécriture grammaticale via la première règle qui matche
+                 (cf. `_QUESTION_REWRITES` au-dessus).
+    Variante 2 : ajout d'un préfixe contextuel locataire + suffixe formel,
+                 et mise en minuscule de la 1re lettre du corps de la question.
+
+    Args:
+        q:    la question originale.
+        seed: graine random pour la reproductibilité.
+
+    Returns:
+        Liste de 0, 1 ou 2 paraphrases distinctes (jamais la question
+        originale elle-même).
+
+    --- Indice léger ---
+    L'augmentation de dataset SANS LLM = règles + randomisation déterministe.
+    `random.Random(seed)` te donne un RNG isolé. Tu construis `variants = []`,
+    tu tentes V1 (réécriture par règle), puis V2 (préfixe + suffixe), et tu
+    renvoies au plus 2 résultats DIFFÉRENTS de l'original.
+
+    --- Indice fort ---
+    ```python
     rng = random.Random(seed)
     variants = []
 
-    # Variante 1 : réécriture grammaticale
+    # V1 : réécriture grammaticale
     v1 = _apply_first_matching_rewrite(q)
     if v1:
         variants.append(v1)
 
-    # Variante 2 : ajout d'un préfixe contextuel + ponctuation formelle
+    # V2 : préfixe contextuel + ponctuation formelle
     prefix = rng.choice(_LOCATAIRE_PREFIXES)
     body = q[0].lower() + q[1:] if q else q
     body = body.rstrip("?").strip()
@@ -109,6 +132,12 @@ def paraphrase_question(q: str, seed: int = 0) -> list[str]:
         variants.append(v2)
 
     return variants[:2]
+    ```
+    """
+    raise NotImplementedError(
+        "Atelier 04 § 4.3 — paraphrase_question. "
+        "Solution : git diff student/04-finetuning atelier/04-finetuning -- scripts/augment_qa_dataset.py"
+    )
 
 
 # ── Règles de reformulation de réponse ────────────────────────────────────────

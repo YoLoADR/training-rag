@@ -298,6 +298,29 @@ def _classify(inp: str) -> str:
 
 
 def generate():
+    """
+    Sérialise `ALL_PAIRS` au format JSONL Alpaca + ajoute la catégorie via
+    `_classify`. Imprime un compteur par catégorie en fin de run.
+
+    Format de sortie (1 ligne JSON par paire) :
+      {"instruction": "...", "input": "...", "output": "...", "category": "..."}
+
+    Pourquoi JSONL ? C'est le format standard pour les datasets de fine-tuning
+    HuggingFace : 1 exemple par ligne = streaming possible sur de très gros
+    fichiers, et `datasets.load_dataset("json", data_files=...)` le lit
+    nativement.
+
+    --- Indice léger ---
+    1. `os.makedirs(OUTPUT_DIR, exist_ok=True)` (crée le dossier si absent).
+    2. Initialise un compteur `cats = {...}` avec 0 par catégorie.
+    3. Ouvre `OUTPUT_FILE` en écriture + encoding="utf-8".
+    4. Pour chaque pair de `ALL_PAIRS`, classifie via `_classify(pair["input"])`,
+       incrémente le compteur, enrichis la paire d'un champ `category`, et
+       écris `json.dumps(enriched, ensure_ascii=False) + "\\n"`.
+    5. Imprime le récap par catégorie.
+
+    --- Indice fort ---
+    ```python
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     cats = {"équipements": 0, "droits": 0, "énergie": 0, "marketplace": 0, "autre": 0}
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
@@ -305,11 +328,17 @@ def generate():
             cat = _classify(pair["input"])
             cats[cat] += 1
             enriched = dict(pair, category=cat)
-            f.write(json.dumps(enriched, ensure_ascii=False) + "\n")
+            f.write(json.dumps(enriched, ensure_ascii=False) + "\\n")
     print(f"  ✓ {OUTPUT_FILE}")
     print(f"     {len(ALL_PAIRS)} paires Q/R générées")
     for cat, n in cats.items():
         print(f"     - {cat}: {n}")
+    ```
+    """
+    raise NotImplementedError(
+        "Atelier 04 § 4.2 — generate() sérialise au format JSONL Alpaca. "
+        "Solution : git diff student/04-finetuning atelier/04-finetuning -- scripts/generate_qa_dataset.py"
+    )
 
 
 if __name__ == "__main__":
