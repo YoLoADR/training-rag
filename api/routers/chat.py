@@ -92,7 +92,23 @@ async def _call_llm_only(message: str) -> dict:
 
 
 async def _call_rag_only(message: str) -> dict:
-    """Mode rag_only : retrieval + LLM sans agent → RAG pur (J1 après-midi)."""
+    """
+    Mode rag_only : retrieval + LLM sans agent → RAG pur (J1 après-midi).
+
+    Doit retourner un dict avec les clés : response, token_usage, sources, steps.
+
+    --- Indice léger ---
+    Le pattern RAG en 4 temps :
+      1. récupère des chunks pertinents via `retrieve(message)` (du module
+         `homebutler.rag.retriever`),
+      2. formate-les en un seul bloc texte via `format_docs_for_context(docs)`,
+      3. compose la chaîne `RAG_QA_TEMPLATE | llm` (LCEL pipe),
+      4. invoque la chaîne avec `{"question": message, "context": context}`.
+    Comme on est dans une coroutine FastAPI mais que LangChain `.invoke()`
+    est synchrone, on délègue à un executor : `await loop.run_in_executor(...)`.
+
+    --- Indice fort ---
+    ```python
     from homebutler.llm.provider import get_llm_cached
     from homebutler.llm.prompts import RAG_QA_TEMPLATE
     from homebutler.rag.retriever import retrieve, format_docs_for_context
@@ -111,10 +127,34 @@ async def _call_rag_only(message: str) -> dict:
         "sources": [s.model_dump() for s in _docs_to_sources(docs)],
         "steps": [],
     }
+    ```
+    """
+    raise NotImplementedError(
+        "Atelier 05 § 3.2 — endpoint /chat?mode=rag_only. "
+        "Solution finale : git diff student/05-deploiement atelier/05-deploiement -- api/routers/chat.py"
+    )
 
 
 async def _call_agent(message: str, session_id: str, debug: bool = False) -> dict:
-    """Mode agent : ReAct avec mémoire de session et outils."""
+    """
+    Mode agent : ReAct avec mémoire de session et outils.
+
+    Doit retourner un dict (response, token_usage, sources, steps).
+    Si `debug=True`, peuple `steps` avec les `intermediate_steps` de l'agent
+    pour exposer la trace Thought/Action/Observation au client.
+
+    --- Indice léger ---
+    Récupère le bon agent selon `debug` :
+      - `get_session_agent_debug(session_id)` si debug=True,
+      - `get_session_agent(session_id)` sinon.
+    L'agent expose `.invoke({"input": message, "chat_history": []})`. Comme
+    pour rag_only, c'est synchrone → wrap dans `loop.run_in_executor`.
+    Le résultat est un dict ; la réponse texte est dans la clé `"output"`.
+    Si debug, on déroule `result["intermediate_steps"]` (liste de couples
+    (AgentAction, observation_str)) pour construire `steps_log`.
+
+    --- Indice fort ---
+    ```python
     from homebutler.agent.react_agent import get_session_agent, get_session_agent_debug
 
     loop = asyncio.get_event_loop()
@@ -124,14 +164,10 @@ async def _call_agent(message: str, session_id: str, debug: bool = False) -> dic
     )
     response_text = result.get("output", "Je n'ai pas pu générer de réponse.")
 
-    # Extraire les sources depuis les steps intermédiaires si disponibles
-    sources = []
-    steps_log = []
+    sources, steps_log = [], []
     if debug and "intermediate_steps" in result:
         for action, observation in result["intermediate_steps"]:
-            steps_log.append(
-                f"Action: {action.tool} | Input: {str(action.tool_input)[:80]}"
-            )
+            steps_log.append(f"Action: {action.tool} | Input: {str(action.tool_input)[:80]}")
             steps_log.append(f"Observation: {str(observation)[:120]}")
 
     return {
@@ -140,6 +176,12 @@ async def _call_agent(message: str, session_id: str, debug: bool = False) -> dic
         "sources": sources,
         "steps": steps_log,
     }
+    ```
+    """
+    raise NotImplementedError(
+        "Atelier 05 § 3.3 — endpoint /chat?mode=agent. "
+        "Solution finale : git diff student/05-deploiement atelier/05-deploiement -- api/routers/chat.py"
+    )
 
 
 # ── POST /chat ────────────────────────────────────────────────────────────────

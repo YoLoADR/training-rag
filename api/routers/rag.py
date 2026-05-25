@@ -78,7 +78,22 @@ async def rag_retrieve(req: RetrieveRequest):
     Retourne les chunks récupérés pour une query avec la stratégie choisie.
     Pédagogie J1 après-midi : transparence sur ce que le RAG récupère.
     Permet de comparer visuellement l'effet du chunking sur le retrieval.
-    """
+
+    Doit retourner un dict :
+        {"query", "strategy", "k_requested", "chunks_found", "results"}
+    où `results` est une liste de `ChunkResult.model_dump()`.
+
+    --- Indice léger ---
+    1. Appelle `_retrieve_with_strategy(req.query, req.strategy, req.k)` —
+       gère les exceptions `FileNotFoundError` (→ 404) et `Exception` (→ 500)
+       via `raise HTTPException(...)`.
+    2. Pour chaque doc retourné (avec son index `i`), construis un `ChunkResult`
+       avec : rank=i+1, source=metadata['source'], page=metadata['page'],
+       excerpt=d.page_content[:200], char_count=len(d.page_content).
+    3. Retourne le dict final.
+
+    --- Indice fort ---
+    ```python
     try:
         docs = _retrieve_with_strategy(req.query, req.strategy, req.k)
     except FileNotFoundError as e:
@@ -96,7 +111,6 @@ async def rag_retrieve(req: RetrieveRequest):
         ).model_dump()
         for i, d in enumerate(docs)
     ]
-
     return {
         "query": req.query,
         "strategy": req.strategy,
@@ -104,6 +118,12 @@ async def rag_retrieve(req: RetrieveRequest):
         "chunks_found": len(chunks),
         "results": chunks,
     }
+    ```
+    """
+    raise NotImplementedError(
+        "Atelier 05 § 3.4 — endpoint /rag/retrieve. "
+        "Solution finale : git diff student/05-deploiement atelier/05-deploiement -- api/routers/rag.py"
+    )
 
 
 # ── POST /rag/evaluate ────────────────────────────────────────────────────────
