@@ -55,13 +55,31 @@ def get_ensemble_retriever(faiss_k: int = 4, chroma_k: int = 3) -> EnsembleRetri
     """
     EnsembleRetriever qui combine FAISS (60%) et ChromaDB (40%).
     Retourne jusqu'à faiss_k + chroma_k documents dédupliqués.
-    """
+
+    Concept Atelier 03 : "hybrid retrieval" = combiner plusieurs retrievers
+    avec des poids pour balancer leurs forces. Ici FAISS apporte la
+    recherche dense (sens), ChromaDB apporte la filtrabilité métadonnées.
+
+    --- Indice léger ---
+    Construis les 2 retrievers via `get_faiss_retriever(k=...)` et
+    `get_chroma_retriever(k=...)`, puis emballe-les dans
+    `EnsembleRetriever(retrievers=[...], weights=[...])` (LangChain — déjà importé).
+    Le poids 0.6 pour FAISS / 0.4 pour ChromaDB est celui décidé dans le
+    cours — FAISS est plus précis sur la sémantique brute, donc favorisé.
+
+    --- Indice fort ---
+    ```python
     faiss_retriever = get_faiss_retriever(k=faiss_k)
     chroma_retriever = get_chroma_retriever(k=chroma_k)
-
     return EnsembleRetriever(
         retrievers=[faiss_retriever, chroma_retriever],
-        weights=[0.6, 0.4],
+        weights=[0.6, 0.4],   # FAISS dominant — voir docstring
+    )
+    ```
+    """
+    raise NotImplementedError(
+        "Atelier 03 § 3.3 — EnsembleRetriever. "
+        "Solution : git diff student/03-pipeline-agent atelier/03-pipeline-agent -- homebutler/rag/retriever.py"
     )
 
 

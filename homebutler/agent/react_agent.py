@@ -70,13 +70,38 @@ def get_agent_executor(
 ) -> AgentExecutor:
     """
     Crée et retourne un AgentExecutor ReAct.
-    - verbose : affiche le raisonnement Thought→Action→Observation
-    - debug   : return_intermediate_steps=True (expose la trace dans l'API)
-    - memory  : ConversationBufferWindowMemory pour la mémoire de session
-    """
+
+    Args:
+        verbose: True → affiche le raisonnement Thought→Action→Observation dans stdout.
+        debug:   True → return_intermediate_steps=True (expose la trace dans l'API).
+        memory:  ConversationBufferWindowMemory pour la mémoire de session
+                 (peut être None pour un agent sans mémoire).
+
+    Returns:
+        Un AgentExecutor LangChain prêt à exécuter `.invoke({"input": ...})`.
+
+    --- Indice léger ---
+    Étapes de construction (l'ordre compte) :
+      1. Récupère un LLM via `get_llm(...)` — l'agent ReAct a besoin d'un peu
+         de marge de tokens, vise `temperature=0.1` et `max_tokens=2048`.
+      2. Récupère le prompt ReAct : tente `hub.pull("hwchase17/react-chat")`,
+         et tombe sur `_build_fallback_prompt()` si offline.
+      3. Construis l'agent avec `create_react_agent(llm, ALL_TOOLS, prompt)`.
+      4. Configure les callbacks de tracing via `_setup_tracing()`.
+      5. Emballe le tout dans un `AgentExecutor(agent=..., tools=ALL_TOOLS, ...)`.
+
+    Paramètres clés à passer à l'AgentExecutor :
+      - `verbose=verbose`
+      - `max_iterations=8` (limite anti-boucle infinie ReAct)
+      - `handle_parsing_errors=True` (récupère gracieusement les outputs mal formés)
+      - `return_intermediate_steps=debug`
+      - `memory=memory`
+      - `callbacks=callbacks if callbacks else None`
+
+    --- Indice fort ---
+    ```python
     llm = get_llm(temperature=0.1, max_tokens=2048)
 
-    # Prompt react-chat supporte {chat_history} pour la mémoire conversationnelle
     try:
         prompt = hub.pull("hwchase17/react-chat")
     except Exception:
@@ -95,6 +120,12 @@ def get_agent_executor(
         return_intermediate_steps=debug,
         memory=memory,
         callbacks=callbacks if callbacks else None,
+    )
+    ```
+    """
+    raise NotImplementedError(
+        "Atelier 03 § 3.2 — agent ReAct. "
+        "Solution : git diff student/03-pipeline-agent atelier/03-pipeline-agent -- homebutler/agent/react_agent.py"
     )
 
 
