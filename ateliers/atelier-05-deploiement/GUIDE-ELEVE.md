@@ -6,6 +6,40 @@
 
 ---
 
+## 🎯 Atelier 05 en un coup d'œil
+
+### État initial (ce qui est déjà là)
+- ✅ **Acquis Ateliers 01-04** : LLM, RAG, agent ReAct fonctionnels. Modèle fine-tuné optionnel.
+- ✅ **Plomberie fournie** : `api/main.py` (FastAPI app, CORS, middleware prompt-injection avec 19 patterns FR+EN), `api/limiter.py` (slowapi 30/min), routers métier (`products`, `orders`, `consumption`), Streamlit UI, Dockerfile, `docker-compose.yml`, helpers Pydantic `ChunkResult` / `SourceDoc` / `ChatRequest`, helpers privés `_docs_to_sources`, `_extract_token_usage`, `_call_llm_only` (mode démo hallucination).
+- 🛠️ **À toi de coder** (fichiers blancs avec indices) :
+  - `api/routers/chat.py` — `_call_rag_only()` et `_call_agent()` (corps entiers : pattern LCEL `chain = TEMPLATE | llm`, asyncio executor, agent.invoke + intermediate_steps)
+  - `api/routers/rag.py` — `rag_retrieve()` endpoint (composition `ChunkResult` Pydantic + gestion `HTTPException`)
+
+> ⚠️ `api/main.py` (notamment le middleware `prompt_injection_filter` + `_INJECTION_PATTERNS`) reste **délibérément corrigé** — c'est de la plomberie sécu, à LIRE pas à coder.
+
+### Objectif mesurable
+- Exposer le chatbot via FastAPI avec rate limit + filtre injection + tracing Langfuse optionnel.
+- `curl -X POST http://localhost:8000/chat -d '{"message":"Quelle est ma chaudière?", "mode":"rag_only"}'` répond en < 5 s.
+
+**Critère de succès** (chiffré, reproductible) :
+```bash
+uvicorn api.main:app --port 8000 &
+curl -s -X POST http://localhost:8000/chat -H 'Content-Type: application/json' \
+  -d '{"message":"Quelle est ma chaudière?","mode":"rag_only"}' | jq .response
+# → réponse non vide en < 5 s
+curl -X POST http://localhost:8000/rag/retrieve -H 'Content-Type: application/json' \
+  -d '{"query":"chaudière","k":3}'
+# → 3 chunks avec source + page + excerpt
+```
+
+### Récupérer la solution (en dernier recours)
+```bash
+git diff student/05-deploiement atelier/05-deploiement -- api/routers/chat.py
+git diff student/05-deploiement atelier/05-deploiement -- api/routers/rag.py
+```
+
+---
+
 ## Pré-vol (avant de commencer)
 
 - [ ] `bash scripts/check_atelier_ready.sh 05` retourne OK

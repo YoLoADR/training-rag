@@ -76,4 +76,25 @@ elif SCORE >= 2:
     print("Bien. Relis les points manquants, puis continue.")
 else:
     print("Revois api/main.py et api/limiter.py avant de continuer.")
+
+# ── Explication personnelle (verbalisation anti-skip blank API) ─────────────
+print()
+print("=" * 60)
+print("EXPLICATION PERSONNELLE (verbalisation)")
+print("=" * 60)
+EXPLAIN_PROMPT = (
+    "Avant de checker la solution par git diff, explique en UNE phrase :\n"
+    "  Pourquoi enveloppe-t-on `chain.invoke(...)` dans\n"
+    "  `await loop.run_in_executor(None, chain.invoke, payload)` ?\n"
+)
+EXPLAIN_KEYWORDS = ["sync", "synchrone", "async", "bloque", "bloquer", "thread", "executor", "fastapi", "event", "loop", "worker"]
+print(EXPLAIN_PROMPT)
+explanation = input("Ta réponse en une phrase : ").strip().lower()
+found = [kw for kw in EXPLAIN_KEYWORDS if kw in explanation]
+if len(found) >= 2:
+    print(f"\n✓ Verbalisation OK (mots-clés : {', '.join(found)})")
+    print("→ Tu peux consulter `git diff student/05 atelier/05 -- <fichier>` si nécessaire.")
+else:
+    print(f"\n✗ Verbalisation insuffisante (mots trouvés : {found or 'aucun'} ; min 2).")
+    print(f"→ Mots attendus : {', '.join(EXPLAIN_KEYWORDS[:5])}…")
     sys.exit(1)
