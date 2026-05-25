@@ -85,4 +85,26 @@ if SCORE >= 2:
     print("Bien. Continue vers le Mini-lab.")
 else:
     print("Relis grille_decision.md et relance evaluate_pipeline.py avant de continuer.")
+
+# ── Explication personnelle (verbalisation anti-skip blank eval) ────────────
+print()
+print("=" * 60)
+print("EXPLICATION PERSONNELLE (verbalisation)")
+print("=" * 60)
+EXPLAIN_PROMPT = (
+    "Avant de checker la solution par git diff, explique en UNE phrase :\n"
+    "  Pourquoi évalue-t-on EN PASSANT PAR L'API HTTP\n"
+    "  (POST /chat, POST /rag/evaluate) plutôt qu'en important\n"
+    "  directement les fonctions Python du retriever ?\n"
+)
+EXPLAIN_KEYWORDS = ["isol", "production", "intégration", "integration", "client", "latence", "réseau", "reseau", "réaliste", "realiste", "bout-en-bout", "bout en bout", "stack"]
+print(EXPLAIN_PROMPT)
+explanation = input("Ta réponse en une phrase : ").strip().lower()
+found = [kw for kw in EXPLAIN_KEYWORDS if kw in explanation]
+if len(found) >= 2:
+    print(f"\n✓ Verbalisation OK (mots-clés : {', '.join(found)})")
+    print("→ Tu peux consulter `git diff student/06 atelier/06 -- evaluate_pipeline.py` si nécessaire.")
+else:
+    print(f"\n✗ Verbalisation insuffisante (mots trouvés : {found or 'aucun'} ; min 2).")
+    print(f"→ Mots attendus : {', '.join(EXPLAIN_KEYWORDS[:6])}…")
     sys.exit(1)

@@ -7,6 +7,35 @@
 
 ---
 
+## 🎯 Atelier 06 en un coup d'œil
+
+### État initial (ce qui est déjà là)
+- ✅ **Acquis Ateliers 01-05** : API FastAPI complète (3 modes `chat`, `/rag/retrieve`, `/rag/evaluate`, `/chat/compare`), UI Streamlit, fine-tuning AT04 optionnel.
+- ✅ **Plomberie fournie** : dataset Q/R conciergerie (`data/qa_dataset/concierge_qa.jsonl`), endpoints `/rag/evaluate` et `/chat/compare` (à activer via `ENABLE_COMPARE_ROUTES=true`), helper `load_qa()`, fonctions d'affichage `show_latency_summary()` / `todo_grille()`.
+- 🛠️ **À toi de coder** (fichiers blancs avec indices) :
+  - `ateliers/atelier-06-finetune-vs-rag/evaluate_pipeline.py` — **TODO 2** `evaluate_strategies()` (boucle 3 stratégies + `POST /rag/evaluate`), **TODO 3** `compare_modes()` (double boucle questions × 3 modes + `POST /chat`), **TODO 5** `show_summary()` (tableau Markdown + benchmarks RAFT 2024).
+
+### Objectif mesurable
+- Tableau Markdown comparatif chiffré : LLM seul / RAG fixed / RAG recursive / RAG ensemble.
+- Grille décision TCO documentée pour 3 cas d'usage métier.
+
+**Critère de succès** (chiffré, reproductible) :
+```bash
+ENABLE_COMPARE_ROUTES=true uvicorn api.main:app --port 8000 &
+python ateliers/atelier-06-finetune-vs-rag/evaluate_pipeline.py
+# → tableau Markdown imprimé, R@1/R@3/R@5 pour 3 stratégies
+# → comparaison latence + benchmarks RAFT (94 % QA factuel, 95 % style, 96 % médical)
+# → recommandation argumentée dans grille_decision.md
+```
+
+### Récupérer la solution (en dernier recours)
+```bash
+git diff student/06-finetune-vs-rag atelier/06-finetune-vs-rag \
+  -- ateliers/atelier-06-finetune-vs-rag/evaluate_pipeline.py
+```
+
+---
+
 ## Pré-vol (avant de commencer)
 
 - [ ] `bash scripts/check_atelier_ready.sh 06` retourne OK
