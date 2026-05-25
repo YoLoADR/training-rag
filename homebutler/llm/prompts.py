@@ -1,85 +1,130 @@
+"""
+Templates de prompts LangChain — Atelier 01.
+
+Tous les prompts utilisateurs et système du projet sont centralisés ici. Les
+4 templates ci-dessous sont importés par le reste du code (RAG, agent, API).
+Tu dois reconstruire leur contenu — les VARIABLES sont définies à vide pour
+ne PAS casser les imports, mais elles produiront des réponses absurdes
+tant que tu n'auras pas écrit le bon prompt.
+
+═══════════════════════════════════════════════════════════════════════════
+🎓 Atelier 01 — Tu dois écrire les 4 templates de prompts ci-dessous.
+   Solution finale (en dernier recours) :
+   git diff student/01-llm-baseline atelier/01-llm-baseline -- homebutler/llm/prompts.py
+═══════════════════════════════════════════════════════════════════════════
+"""
+
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate, MessagesPlaceholder
 
-# ── Prompt système conciergerie ───────────────────────────────────────────────
-CONCIERGE_SYSTEM_PROMPT = """Tu es HomeButler, la conciergerie domestique intelligente et bienveillante.
-Tu aides les occupants de leur logement avec chaleur et expertise.
-
-Tes domaines de compétence :
-- Les documents du logement (bail, règlement de copropriété, notices d'équipements, DPE)
-- L'analyse des consommations énergétiques et les conseils d'optimisation
-- La mise en relation avec des producteurs et artisans locaux
-- Les conseils pratiques du quotidien liés au logement
-
-Ton ton : chaleureux, bienveillant, pratique. Tu utilises un vocabulaire accessible (pas trop technique).
-Tu proposes toujours des actions concrètes. Tu indiques tes sources quand tu cites un document.
-Si tu ne sais pas, tu le dis clairement plutôt que d'inventer."""
-
-# ── Q/A avec contexte documentaire (RAG) ─────────────────────────────────────
-RAG_QA_TEMPLATE = ChatPromptTemplate.from_messages(
-    [
-        ("system", CONCIERGE_SYSTEM_PROMPT),
-        (
-            "human",
-            """Voici des extraits de documents de votre logement pertinents pour votre question :
-
-{context}
-
----
-Question : {question}
-
-Réponds en te basant sur les documents ci-dessus. Cite la source entre crochets [nom_du_document].""",
-        ),
-    ]
+# ── Prompt système conciergerie (À ÉCRIRE) ───────────────────────────────────
+# CONCIERGE_SYSTEM_PROMPT = le "rôle" donné au LLM. C'est ce qui définit son TON,
+# son DOMAINE, et ses LIMITES. Voir analogie "fiche de poste" du carnet de bord.
+#
+# --- Indice léger ---
+# Doit décrire : (a) qui est HomeButler (conciergerie domestique chaleureuse),
+# (b) ses domaines (documents logement, énergie, producteurs locaux, conseils
+# pratiques), (c) son ton (chaleureux, vocabulaire accessible, actions concrètes,
+# cite les sources), (d) sa limite : "Si tu ne sais pas, dis-le plutôt qu'inventer".
+#
+# --- Indice fort ---
+# Triple-quoted string de 8-12 lignes, en français, qui commence par
+# "Tu es HomeButler, la conciergerie domestique intelligente et bienveillante."
+# et qui détaille les 4 domaines, le ton, et la règle anti-hallucination.
+CONCIERGE_SYSTEM_PROMPT = (
+    "# TODO (Atelier 01) — Écris ici le system prompt de HomeButler. "
+    "Voir docstring ci-dessus. "
+    "Solution : git diff student/01-llm-baseline atelier/01-llm-baseline -- homebutler/llm/prompts.py"
 )
 
-# ── Analyse énergie ───────────────────────────────────────────────────────────
-ENERGY_ANALYSIS_TEMPLATE = ChatPromptTemplate.from_messages(
-    [
-        ("system", CONCIERGE_SYSTEM_PROMPT),
-        (
-            "human",
-            """Voici les données de consommation électrique de votre logement :
+# ── 1) Q/A avec contexte documentaire RAG (À ÉCRIRE) ────────────────────────
+# RAG_QA_TEMPLATE est utilisé par /chat?mode=rag_only. Il reçoit deux variables :
+# `{context}` (chunks récupérés par FAISS) et `{question}` (la question utilisateur).
+#
+# --- Indice léger ---
+# ChatPromptTemplate.from_messages([...]) avec 2 rôles : "system" (le system prompt
+# ci-dessus) et "human" (un texte qui contient les chunks puis la question, et qui
+# demande au LLM de citer la source entre crochets [nom_du_document]).
+#
+# --- Indice fort ---
+# ```python
+# RAG_QA_TEMPLATE = ChatPromptTemplate.from_messages([
+#     ("system", CONCIERGE_SYSTEM_PROMPT),
+#     ("human",
+#      "Voici des extraits de documents de votre logement pertinents pour votre question :\n\n"
+#      "{context}\n\n---\nQuestion : {question}\n\n"
+#      "Réponds en te basant sur les documents ci-dessus. "
+#      "Cite la source entre crochets [nom_du_document]."),
+# ])
+# ```
+RAG_QA_TEMPLATE = ChatPromptTemplate.from_messages([
+    ("system", "TODO Atelier 01 — réécris ce system prompt"),
+    ("human", "TODO — utilise {context} et {question} — voir docstring ci-dessus"),
+])
 
-Résumé mensuel (derniers mois) :
-{monthly_summary}
+# ── 2) Analyse énergie (À ÉCRIRE) ────────────────────────────────────────────
+# ENERGY_ANALYSIS_TEMPLATE est utilisé pour l'outil "analyse de consommation".
+# Variables : `{monthly_summary}`, `{anomalies}`, `{question}`.
+#
+# --- Indice léger ---
+# ChatPromptTemplate à 2 messages (system + human). Le human contient les
+# 3 variables et demande "une analyse personnalisée avec des conseils concrets
+# pour optimiser la consommation".
+#
+# --- Indice fort ---
+# ```python
+# ENERGY_ANALYSIS_TEMPLATE = ChatPromptTemplate.from_messages([
+#     ("system", CONCIERGE_SYSTEM_PROMPT),
+#     ("human",
+#      "Voici les données de consommation électrique de votre logement :\n\n"
+#      "Résumé mensuel (derniers mois) :\n{monthly_summary}\n\n"
+#      "Anomalies détectées :\n{anomalies}\n\n"
+#      "Question : {question}\n\n"
+#      "Donne une analyse personnalisée avec des conseils concrets pour optimiser la consommation."),
+# ])
+# ```
+ENERGY_ANALYSIS_TEMPLATE = ChatPromptTemplate.from_messages([
+    ("system", "TODO Atelier 01 — réécris ce system prompt"),
+    ("human", "TODO — utilise {monthly_summary}, {anomalies}, {question}"),
+])
 
-Anomalies détectées :
-{anomalies}
-
-Question : {question}
-
-Donne une analyse personnalisée avec des conseils concrets pour optimiser la consommation.""",
-        ),
-    ]
+# ── 3) Template ReAct fallback (À ÉCRIRE) ───────────────────────────────────
+# REACT_SYSTEM_TEMPLATE est utilisé par l'agent ReAct quand le hub LangChain
+# (`hwchase17/react`) est indisponible. Variables imposées par LangChain :
+# `{tools}`, `{tool_names}`, `{input}`, `{agent_scratchpad}`.
+#
+# --- Indice léger ---
+# Texte brut (string Python) qui :
+#   1. Présente HomeButler et liste les outils via {tools},
+#   2. Force le format STRICT : Question / Réflexion / Action / Entrée de l'action
+#      / Observation (boucle) / Réflexion / Réponse finale,
+#   3. Termine par "Question : {input}\nRéflexion : {agent_scratchpad}".
+#
+# --- Indice fort ---
+# String triple-quotée de ~15-20 lignes, voir exemple dans la doc LangChain
+# "ReAct prompting" ou dans la version corrigée via git diff. Doit obligatoirement
+# contenir les 4 placeholders `{tools}`, `{tool_names}`, `{input}`, `{agent_scratchpad}`.
+REACT_SYSTEM_TEMPLATE = (
+    "TODO Atelier 01 — écris ici le template ReAct. "
+    "Variables OBLIGATOIRES : {tools} {tool_names} {input} {agent_scratchpad}. "
+    "Solution : git diff student/01-llm-baseline atelier/01-llm-baseline -- homebutler/llm/prompts.py"
 )
 
-# ── Template ReAct (pour l'agent) ─────────────────────────────────────────────
-# Note : on utilise le prompt hub hwchase17/react via langchain hub dans l'agent.
-# Ce template est fourni comme alternative explicite pour la formation.
-REACT_SYSTEM_TEMPLATE = """Tu es HomeButler, conciergerie domestique intelligente.
-Tu réponds aux questions en utilisant les outils disponibles.
-
-Tu as accès aux outils suivants :
-{tools}
-
-Pour répondre, suis ce format STRICT :
-Question : la question posée
-Réflexion : réfléchis à ce que tu dois faire
-Action : l'outil à utiliser, doit être l'un de [{tool_names}]
-Entrée de l'action : l'entrée pour l'outil
-Observation : le résultat de l'outil
-... (répète Réflexion/Action/Entrée/Observation si nécessaire)
-Réflexion : Je connais maintenant la réponse finale
-Réponse finale : la réponse à la question originale
-
-Commence !
-
-Question : {input}
-Réflexion : {agent_scratchpad}"""
-
-# ── LLM seul, sans contexte documentaire (mode llm_only) ─────────────────────
-# Intentionnellement sans injection RAG — démontre les hallucinations (J1 matin).
+# ── 4) LLM seul, sans contexte documentaire (À ÉCRIRE) ──────────────────────
+# BARE_LLM_TEMPLATE est utilisé par /chat?mode=llm_only — c'est le mode qui
+# démontre les hallucinations en J1 matin (le LLM ne reçoit AUCUN document).
+#
+# --- Indice léger ---
+# ChatPromptTemplate ultra-minimaliste : 2 messages (system + human), le human
+# ne contient QUE la question (pas de context).
+#
+# --- Indice fort ---
+# ```python
+# BARE_LLM_TEMPLATE = ChatPromptTemplate.from_messages([
+#     ("system", CONCIERGE_SYSTEM_PROMPT),
+#     ("human", "{question}"),
+# ])
+# ```
 BARE_LLM_TEMPLATE = ChatPromptTemplate.from_messages([
-    ("system", CONCIERGE_SYSTEM_PROMPT),
+    ("system", "TODO Atelier 01 — réécris ce system prompt"),
     ("human", "{question}"),
 ])
