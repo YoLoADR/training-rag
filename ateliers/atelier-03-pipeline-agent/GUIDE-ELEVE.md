@@ -6,6 +6,35 @@
 
 ---
 
+## 🎯 Atelier 03 en un coup d'œil
+
+### État initial (ce qui est déjà là)
+- ✅ **Acquis Ateliers 01-02** : LLM (`get_llm`), 4 templates de prompts, RAG FAISS (`get_embeddings`, `build_faiss_index`).
+- ✅ **Plomberie fournie** : services métier opérationnels (`homebutler/services/{weather,energy,marketplace}.py`), 4 outils LangChain construits dans `homebutler/agent/tools.py` (`ALL_TOOLS` exporté), wrapper ChromaDB (`vectorstore_chroma.py`), prompt `hwchase17/react-chat` du hub LangChain.
+- 🛠️ **À toi de coder** (fichiers blancs avec indices) :
+  - `homebutler/agent/react_agent.py` — `get_agent_executor()` (corps entier : hub.pull + create_react_agent + AgentExecutor)
+  - `homebutler/rag/retriever.py` — `get_ensemble_retriever()` (concept hybrid retrieval, poids FAISS 60 % / Chroma 40 %)
+
+> ⚠️ `homebutler/agent/tools.py` et `homebutler/rag/vectorstore_chroma.py` sont **délibérément laissés corrigés** (scope réduit Rev 2 — calibrage 1h40). Tu les utilises mais tu ne les codes pas.
+
+### Objectif mesurable
+- Agent ReAct qui combine RAG + appel d'outil météo dans une conversation cohérente.
+- Test Bug Hunt `bugs/test_v1.py` passe vert.
+
+**Critère de succès** (chiffré, reproductible) :
+```bash
+pytest ateliers/atelier-03-pipeline-agent/bugs/test_v1.py -v
+# → test passe ; agent boucle ReAct au max 8 itérations.
+```
+
+### Récupérer la solution (en dernier recours)
+```bash
+git diff student/03-pipeline-agent atelier/03-pipeline-agent -- homebutler/agent/react_agent.py
+git diff student/03-pipeline-agent atelier/03-pipeline-agent -- homebutler/rag/retriever.py
+```
+
+---
+
 ## 🚦 Pré-vol (avant de commencer)
 
 - [ ] `bash scripts/check_atelier_ready.sh 03` retourne OK

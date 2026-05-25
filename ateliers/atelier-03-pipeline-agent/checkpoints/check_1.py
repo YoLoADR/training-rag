@@ -64,6 +64,22 @@ QUESTIONS = [
 ]
 
 
+# ── Question d'explication personnelle (anti-skip blank) ────────────────────
+EXPLAIN_PROMPT = (
+    "Avant de checker la solution par git diff, explique en UNE phrase :\n"
+    "  Pourquoi on combine FAISS (60 %) et ChromaDB (40 %) dans un\n"
+    "  EnsembleRetriever, plutôt que d'utiliser un seul des deux ?\n"
+)
+EXPLAIN_KEYWORDS = ["filtrage", "metadata", "métadonnée", "metadonnee", "complémentaire", "complementaire", "sémantique", "semantique", "hybride", "couverture", "rappel", "diversité", "diversite"]
+EXPLAIN_MIN_KW = 2
+
+
+def _verify_explanation(answer: str) -> tuple[bool, list[str]]:
+    a = answer.lower()
+    found = [kw for kw in EXPLAIN_KEYWORDS if kw in a]
+    return (len(found) >= EXPLAIN_MIN_KW), found
+
+
 def run_quiz():
     print("=" * 60)
     print("Checkpoint 1 -- EnsembleRetriever / ChromaDB / Hybrid Search")
@@ -105,6 +121,20 @@ def run_quiz():
         print("Sans validation de ce checkpoint, on ne passe pas a l'etape suivante.")
 
     print("=" * 60)
+
+    # ── Explication personnelle (verbalisation anti-skip) ───────────────────
+    print("\n" + "=" * 60)
+    print("EXPLICATION PERSONNELLE (verbalisation)")
+    print("=" * 60)
+    print(EXPLAIN_PROMPT)
+    explanation = input("Ta reponse en une phrase : ").strip()
+    ok, found = _verify_explanation(explanation)
+    if ok:
+        print(f"\nOK Verbalisation (mots-cles : {', '.join(found)})")
+        print("=> Tu peux consulter `git diff student/03 atelier/03 -- <fichier>` si necessaire.")
+    else:
+        print(f"\nVerbalisation insuffisante (mots trouves : {found or 'aucun'} ; min {EXPLAIN_MIN_KW}).")
+        print(f"=> Mots attendus : {', '.join(EXPLAIN_KEYWORDS[:5])}...")
     return score
 
 
