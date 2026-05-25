@@ -53,6 +53,21 @@ QUESTIONS = [
 
 SCORE_MIN = 2  # score minimum pour valider
 
+# ── Question d'explication personnelle (anti-skip blank) ────────────────────
+EXPLAIN_PROMPT = (
+    "Avant de checker la solution par git diff, explique en UNE phrase :\n"
+    "  Pourquoi pour une CONCIERGERIE on choisit une température proche\n"
+    "  de 0.0–0.2 plutôt que 0.8–1.0 ?\n"
+)
+EXPLAIN_KEYWORDS = ["factuel", "déterministe", "deterministe", "aléatoire", "aleatoire", "halluciner", "stable", "reproductible", "créatif", "creatif"]
+EXPLAIN_MIN_KW = 2
+
+
+def _verify_explanation(answer: str) -> tuple[bool, list[str]]:
+    a = answer.lower()
+    found = [kw for kw in EXPLAIN_KEYWORDS if kw in a]
+    return (len(found) >= EXPLAIN_MIN_KW), found
+
 
 def run_quiz() -> None:
     print("\n" + "=" * 60)
@@ -88,12 +103,25 @@ def run_quiz() -> None:
         print(f"\n[{num}] {statut} — {explication}")
 
     if score >= SCORE_MIN:
-        print(f"\nRESULTAT : VALIDE ({score}/3 >= {SCORE_MIN}/3)")
-        print("=> Continue vers l'Etape 2 du Tronc Commun.")
+        print(f"\nRESULTAT QCM : VALIDE ({score}/3 >= {SCORE_MIN}/3)")
     else:
-        print(f"\nRESULTAT : A RENFORCER ({score}/3 < {SCORE_MIN}/3)")
+        print(f"\nRESULTAT QCM : A RENFORCER ({score}/3 < {SCORE_MIN}/3)")
         print("=> Relis le Carnet de bord (LLM, hallucination, temperature, token)")
-        print("=> Puis relance ce checkpoint.")
+
+    # ── Explication personnelle (verbalisation anti-skip) ───────────────────
+    print("\n" + "=" * 60)
+    print("EXPLICATION PERSONNELLE (verbalisation)")
+    print("=" * 60)
+    print(EXPLAIN_PROMPT)
+    explanation = input("Ta réponse en une phrase : ").strip()
+    ok, found = _verify_explanation(explanation)
+    if ok:
+        print(f"\n✓ Verbalisation OK (mots-clés détectés : {', '.join(found)})")
+        print("=> Tu peux maintenant consulter `git diff student/01 atelier/01 -- <fichier>` si nécessaire.")
+    else:
+        print(f"\n✗ Verbalisation insuffisante (mots-clés trouvés : {found or 'aucun'} ; min {EXPLAIN_MIN_KW}).")
+        print(f"=> Mots attendus : {', '.join(EXPLAIN_KEYWORDS[:5])}…")
+        print("=> Relis la docstring de `get_llm()` (indice fort) avant de continuer.")
 
 
 if __name__ == "__main__":

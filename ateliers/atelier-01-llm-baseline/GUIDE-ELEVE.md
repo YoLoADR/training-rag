@@ -6,6 +6,38 @@
 
 ---
 
+## 🎯 Atelier 01 en un coup d'œil
+
+### État initial (ce qui est déjà là)
+- ✅ **Squelette projet** : `config.py` avec variables LLM (`LLM_PROVIDER`, `ANTHROPIC_API_KEY`, `OLLAMA_HOST`, `OLLAMA_MODEL`), deps Python installées via `pyproject.toml`.
+- ✅ **Plomberie fournie** : `homebutler/llm/__init__.py`, fichier `exercice.py` cadré (10 questions étalons + boucle test).
+- 🛠️ **À toi de coder** (fichiers blancs avec indices) :
+  - `homebutler/llm/provider.py` — fonctions `get_llm()` et `get_llm_cached()` (corps entiers + paramètres `temperature` / `max_tokens` ciblés en `# TODO`)
+  - `homebutler/llm/prompts.py` — 4 templates : `CONCIERGE_SYSTEM_PROMPT`, `RAG_QA_TEMPLATE`, `ENERGY_ANALYSIS_TEMPLATE`, `REACT_SYSTEM_TEMPLATE`, `BARE_LLM_TEMPLATE`
+
+### Objectif mesurable
+- Lancer 10 questions à un LLM (Claude ou Ollama), observer ses **hallucinations** sur les questions privées, et tempérer le comportement via `temperature` + `system prompt`.
+
+**Critère de succès** (chiffré, reproductible) :
+```bash
+python ateliers/atelier-01-llm-baseline/exercice.py
+# → hallucination rate ≥ 80 % sur les 5 questions privées
+# → script tourne en < 5 s par question (< 60 s total)
+```
+
+### Récupérer la solution (en dernier recours)
+```bash
+git diff student/01-llm-baseline atelier/01-llm-baseline -- homebutler/llm/provider.py
+git diff student/01-llm-baseline atelier/01-llm-baseline -- homebutler/llm/prompts.py
+```
+À utiliser **après** avoir essayé les 2 niveaux d'indices et bloqué > 15 min.
+
+### Ordre d'exécution (Bug Hunt préservé)
+1. **Tronc commun (~1h40)** : remplir `NotImplementedError` + `# TODO` en suivant les indices, puis `python exercice.py` tourne.
+2. **Sprint (~30 min)** : appliquer `bugs/v1.patch` → `bugs/v2.patch` → `bugs/v3.patch`, diagnostiquer chaque échec.
+
+---
+
 ## 🚦 Pré-vol (avant de commencer) — 20 min
 
 - [ ] `bash scripts/check_atelier_ready.sh 01` retourne OK
