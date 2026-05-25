@@ -61,6 +61,21 @@ LEXIQUE = [
 
 SCORE_MIN = 2
 
+# ── Question d'explication personnelle (anti-skip blank LoRA) ───────────────
+EXPLAIN_PROMPT = (
+    "Avant de checker la solution par git diff, explique en UNE phrase :\n"
+    "  Pourquoi LoRA n'entraîne que les matrices q_proj et v_proj\n"
+    "  (et pas TOUTES les matrices du modèle) ?\n"
+)
+EXPLAIN_KEYWORDS = ["attention", "param", "vram", "mémoire", "memoire", "gel", "frozen", "rang", "rank", "efficac", "économ", "econom", "petit"]
+EXPLAIN_MIN_KW = 2
+
+
+def _verify_explanation(answer: str) -> tuple[bool, list[str]]:
+    a = answer.lower()
+    found = [kw for kw in EXPLAIN_KEYWORDS if kw in a]
+    return (len(found) >= EXPLAIN_MIN_KW), found
+
 
 def run_quiz() -> None:
     print("\n" + "=" * 65)
@@ -99,13 +114,25 @@ def run_quiz() -> None:
     print("=" * 65)
 
     if score >= SCORE_MIN:
-        print(f"\nRÉSULTAT : VALIDE ({score}/3 ≥ {SCORE_MIN}/3)")
-        print("→ Continue vers l'Étape 2 (Colab + Training).")
+        print(f"\nRÉSULTAT QCM : VALIDE ({score}/3 ≥ {SCORE_MIN}/3)")
     else:
-        print(f"\nRÉSULTAT : À RENFORCER ({score}/3 < {SCORE_MIN}/3)")
+        print(f"\nRÉSULTAT QCM : À RENFORCER ({score}/3 < {SCORE_MIN}/3)")
         print("→ Relis le Carnet de bord pour les termes manqués.")
-        print("→ Demande à un pair d'expliquer sans le guide.")
-        print("→ Relance ce checkpoint quand tu te sens prêt.")
+
+    # ── Explication personnelle (verbalisation anti-skip blank LoRA) ────────
+    print("\n" + "=" * 65)
+    print("EXPLICATION PERSONNELLE (verbalisation)")
+    print("=" * 65)
+    print(EXPLAIN_PROMPT)
+    explanation = input("Ta réponse en une phrase : ").strip()
+    ok, found = _verify_explanation(explanation)
+    if ok:
+        print(f"\n✓ Verbalisation OK (mots-clés détectés : {', '.join(found)})")
+        print("→ Tu peux consulter `git diff student/04 atelier/04 -- <fichier>` si nécessaire.")
+    else:
+        print(f"\n✗ Verbalisation insuffisante (mots trouvés : {found or 'aucun'} ; min {EXPLAIN_MIN_KW}).")
+        print(f"→ Mots attendus : {', '.join(EXPLAIN_KEYWORDS[:6])}…")
+        print("→ Relis la cellule 13 du notebook (commentaire « Indice fort ») avant de continuer.")
 
 
 if __name__ == "__main__":

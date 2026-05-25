@@ -6,6 +6,36 @@
 
 ---
 
+## 🎯 Atelier 04 en un coup d'œil
+
+### État initial (ce qui est déjà là)
+- ✅ **Acquis Ateliers 01-03** : LLM, RAG, agent ReAct fonctionnels.
+- ✅ **Plomberie fournie** : 150 paires Q/R en dur (`QA_PAIRS` dans `generate_qa_dataset.py`), règles de paraphrase (`_QUESTION_REWRITES`, `_LOCATAIRE_PREFIXES`), template Mistral instruct, prompts + Colab T4 préconfiguré.
+- 🛠️ **À toi de coder** (fichiers blancs avec indices) :
+  - `notebooks/03_finetuning_lora.ipynb` — 3 cellules pivots (cellule 11 chargement QLoRA 4-bit, cellule 13 LoraConfig, cellule 15 TrainingArguments + SFTTrainer)
+  - `scripts/generate_qa_dataset.py` — `generate()` (sérialisation JSONL Alpaca + classification)
+  - `scripts/augment_qa_dataset.py` — `paraphrase_question()` (data augmentation par règles + RNG seeded)
+
+> 💡 Le script `scripts/blank_notebook.py` montre comment ces 3 cellules ont été remises à blanc (reproductibilité). Tu peux le lire pour comprendre l'édition `nbformat`, mais tu n'as PAS à le toucher.
+
+### Objectif mesurable
+- Fine-tuner Mistral-7B-Instruct-v0.2 avec LoRA sur Colab T4.
+- Charger l'adapter, comparer la qualité base vs FT sur 10 questions.
+
+**Critère de succès** (chiffré, reproductible) :
+- Loss train ≤ 1.5 après 3 epochs sur 150 paires.
+- ROUGE-L FT > ROUGE-L base sur les 10 questions de test.
+- Adapter LoRA < 50 Mo (vs 14 Go pour le modèle complet).
+
+### Récupérer la solution (en dernier recours)
+```bash
+git diff student/04-finetuning atelier/04-finetuning -- notebooks/03_finetuning_lora.ipynb
+git diff student/04-finetuning atelier/04-finetuning -- scripts/generate_qa_dataset.py
+git diff student/04-finetuning atelier/04-finetuning -- scripts/augment_qa_dataset.py
+```
+
+---
+
 ## 🚦 Pré-vol (avant de commencer)
 
 - [ ] `bash scripts/check_atelier_ready.sh 04` retourne OK
