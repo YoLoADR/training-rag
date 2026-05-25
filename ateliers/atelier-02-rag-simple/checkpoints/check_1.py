@@ -70,6 +70,24 @@ QUESTIONS = [
 
 SCORE_MIN = 2
 
+# ── Question d'explication personnelle (anti-skip blank) ────────────────────
+# Force la verbalisation AVANT de récupérer la solution via `git diff`.
+# Accepte si ≥ 2 mots-clés attendus sont présents dans la réponse libre.
+EXPLAIN_PROMPT = (
+    "Avant de checker la solution par git diff, explique en UNE phrase :\n"
+    "  Que fait `RecursiveCharacterTextSplitter` et pourquoi on lui passe\n"
+    "  une LISTE de séparateurs (et pas un seul) ?\n"
+)
+EXPLAIN_KEYWORDS = ["séparateur", "separateur", "paragraphe", "récursif", "recursif", "chunk", "ordre", "naturel"]
+EXPLAIN_MIN_KW = 2
+
+
+def _verify_explanation(answer: str) -> tuple[bool, list[str]]:
+    """Vérifie qu'au moins EXPLAIN_MIN_KW mots-clés sont présents (insensible casse)."""
+    a = answer.lower()
+    found = [kw for kw in EXPLAIN_KEYWORDS if kw in a]
+    return (len(found) >= EXPLAIN_MIN_KW), found
+
 
 def run_quiz() -> None:
     print("\n" + "=" * 60)
@@ -105,12 +123,26 @@ def run_quiz() -> None:
         print(f"\n[{num}] {statut} — {explication}")
 
     if score >= SCORE_MIN:
-        print(f"\nRESULTAT : VALIDE ({score}/3 >= {SCORE_MIN}/3)")
-        print("=> Continue vers l'Etape 2 (FAISS + retriever).")
+        print(f"\nRESULTAT QCM : VALIDE ({score}/3 >= {SCORE_MIN}/3)")
     else:
-        print(f"\nRESULTAT : A RENFORCER ({score}/3 < {SCORE_MIN}/3)")
+        print(f"\nRESULTAT QCM : A RENFORCER ({score}/3 < {SCORE_MIN}/3)")
         print("=> Relis le Carnet de bord (Embedding, Fixed vs Recursive, chunk_overlap)")
         print("=> Puis relance ce checkpoint.")
+
+    # ── Explication personnelle (verbalisation anti-skip) ───────────────────
+    print("\n" + "=" * 60)
+    print("EXPLICATION PERSONNELLE (verbalisation)")
+    print("=" * 60)
+    print(EXPLAIN_PROMPT)
+    explanation = input("Ta réponse en une phrase : ").strip()
+    ok, found = _verify_explanation(explanation)
+    if ok:
+        print(f"\n✓ Verbalisation OK (mots-clés détectés : {', '.join(found)})")
+        print("=> Tu peux maintenant consulter `git diff student/02 atelier/02 -- <fichier>` si nécessaire.")
+    else:
+        print(f"\n✗ Verbalisation insuffisante (mots-clés trouvés : {found or 'aucun'} ; min {EXPLAIN_MIN_KW}).")
+        print(f"=> Indices attendus dans la réponse : {', '.join(EXPLAIN_KEYWORDS[:5])}…")
+        print("=> Relis l'indice fort de la docstring de `chunk_recursive` avant de continuer.")
 
 
 if __name__ == "__main__":

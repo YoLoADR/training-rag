@@ -6,6 +6,40 @@
 
 ---
 
+## 🎯 Atelier 02 en un coup d'œil
+
+### État initial (ce qui est déjà là)
+- ✅ **Acquis Atelier 01** : LLM `get_llm()` fonctionnel, 4 templates de prompts (`RAG_QA_TEMPLATE` notamment).
+- ✅ **Plomberie fournie** : 5 PDFs HomeButler dans `data/raw/`, `config.py`, `load_pdf_with_metadata()` (lecture seule), pipeline d'orchestration `ingest_all_documents()`, script `evaluate_rag.py` (LLM-judge clé en main).
+- 🛠️ **À toi de coder** (fichiers blancs avec indices) :
+  - `homebutler/rag/ingestion.py` — fonctions `chunk_fixed_size`, `chunk_recursive`, `chunk_semantic` (corps entiers)
+  - `homebutler/rag/vectorstore_faiss.py` — fonctions `get_embeddings`, `build_faiss_index`, `load_faiss_index` (corps entiers)
+
+### Objectif mesurable
+À la fin de cet atelier, tu dois pouvoir :
+- Charger les 5 PDFs, les chunker selon 3 stratégies, et les indexer dans FAISS.
+- Répondre à une question en citant la source (`notice_chaudiere.pdf, p.2`).
+- Mesurer la qualité du RAG sur les 5 questions étalons.
+
+**Critère de succès** (chiffré, reproductible) :
+```bash
+python ateliers/atelier-02-rag-simple/evaluate_rag.py
+# → Recall@5 ≥ 0.80 ET Faithfulness ≥ 0.85
+```
+
+### Récupérer la solution (en dernier recours)
+```bash
+git diff student/02-rag-simple atelier/02-rag-simple -- homebutler/rag/ingestion.py
+git diff student/02-rag-simple atelier/02-rag-simple -- homebutler/rag/vectorstore_faiss.py
+```
+À utiliser **après** avoir essayé les 2 niveaux d'indices (docstrings de chaque fonction) et bloqué > 15 min.
+
+### Ordre d'exécution (Bug Hunt préservé)
+1. **Tronc commun (~1h40)** : remplir les `NotImplementedError` en suivant les indices, puis `pytest ateliers/atelier-02-rag-simple/` passe vert.
+2. **Sprint (~30 min)** : appliquer `bugs/v1.patch` → `bugs/v2.patch` → `bugs/v3.patch` séquentiellement, diagnostiquer chaque échec, répondre au QCM `v*_explanation.md`.
+
+---
+
 ## 🚦 Pré-vol (avant de commencer) — 20 min
 
 - [ ] `bash scripts/check_atelier_ready.sh 02` retourne OK

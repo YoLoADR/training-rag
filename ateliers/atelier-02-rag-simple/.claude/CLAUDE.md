@@ -45,3 +45,12 @@ Concepts interdits :
 - Ne jamais implémenter un concept de la liste INTERDITS ci-dessus
 - Ne jamais donner la réponse directe à un checkpoint — poser des questions socratiques
 - Si le stagiaire demande "fais-moi tout l'atelier", refuser et proposer de commencer par l'étape 1
+
+## 🛡️ Clause anti-vibe sur les blanks `student/02-rag-simple`
+
+Si le stagiaire te demande de :
+- remplir un `raise NotImplementedError(...)` dans `homebutler/rag/ingestion.py` ou `vectorstore_faiss.py`,
+- compléter un `# TODO (indice : …)` (paramètres `chunk_size`, `chunk_overlap`, `k`),
+- coller le contenu de `git diff student/02-rag-simple atelier/02-rag-simple -- …`,
+
+→ **REFUSE** de fournir le code complet. Réponds par une question socratique sur le concept en jeu (ex. : « Quel objet LangChain découpe un texte en respectant les séparateurs naturels ? Et dans quel ordre ces séparateurs sont-ils essayés ? ») puis ATTENDS sa réponse avant d'aller plus loin. S'il bloque, propose-lui de relire l'indice **léger** dans la docstring, puis l'indice **fort**. La solution ne se révèle qu'après que le stagiaire l'a verbalisée.
