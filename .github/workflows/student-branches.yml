@@ -1,0 +1,90 @@
+name: Student branches — import smoke + scope check
+
+# CI volontairement LÉGÈRE : on ne lance PAS pytest (qui DOIT échouer par
+# conception sur les NotImplementedError des blanks). On vérifie seulement :
+#   1. Le scope du diff (verify_branch_scope.sh) — pas de fichiers hors périmètre.
+#   2. Les imports ne sont pas cassés (signatures préservées).
+
+on:
+  push:
+    branches:
+      - 'student/**'
+  pull_request:
+    branches:
+      - 'student/**'
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # nécessaire pour `git diff` contre atelier/*
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install minimal deps (no heavy ML libs)
+        run: |
+          python -m pip install --upgrade pip
+          # On installe SEULEMENT ce qu'il faut pour importer homebutler.
+          # Pas de torch / transformers (10 min de DL, inutile pour un smoke test).
+          pip install pydantic python-dotenv langchain-core langchain-anthropic \
+                      langchain-community langchain-text-splitters \
+                      pymupdf fastapi slowapi || true
+          # `|| true` : si une dep n'existe pas pour 3.11, on continue —
+          # le smoke test "import" lèvera l'erreur exacte.
+
+      - name: Verify branch scope (no out-of-scope files modified)
+        run: |
+          # Détermine la branche atelier/ correspondante depuis le nom de la
+          # branche student/. Ex : student/02-rag-simple → atelier/02-rag-simple.
+          STUDENT_BRANCH="${GITHUB_REF_NAME}"
+          ATELIER_BRANCH="atelier/${STUDENT_BRANCH#student/}"
+          echo "Comparing $STUDENT_BRANCH ↔ $ATELIER_BRANCH"
+
+          if [ -f scripts/verify_branch_scope.sh ]; then
+            bash scripts/verify_branch_scope.sh || {
+              echo "::warning::verify_branch_scope.sh reported issues (non-blocking for student branches)"
+            }
+          else
+            echo "::warning::scripts/verify_branch_scope.sh not found — skipping scope check"
+          fi
+
+      - name: Import smoke test
+        run: |
+          # Le but : confirmer que les signatures + imports du package homebutler
+          # n'ont PAS été cassés par le blanking (NotImplementedError dans le
+          # corps, pas au top-level).
+          python -c "
+          import homebutler
+          from homebutler import config
+          from homebutler.llm import provider, prompts
+          print('homebutler.llm imports OK')
+
+          try:
+              from homebutler.rag import ingestion, vectorstore_faiss
+              print('homebutler.rag imports OK')
+          except ImportError as e:
+              print(f'homebutler.rag import OPTIONAL skipped: {e}')
+
+          try:
+              from homebutler.agent import react_agent, tools
+              print('homebutler.agent imports OK')
+          except ImportError as e:
+              print(f'homebutler.agent import OPTIONAL skipped: {e}')
+          "
+
+      - name: Compile-check all Python files
+        run: |
+          # Garantit qu'aucun fichier .py n'a une erreur de SYNTAXE.
+          # py_compile est ultra rapide et n'exécute pas le code.
+          python -m compileall -q homebutler/ api/ scripts/ ateliers/ || {
+            echo "::error::Compile-check failed — un fichier Python a une erreur de syntaxe"
+            exit 1
+          }
+          echo "All .py files compile cleanly."
