@@ -1,0 +1,13 @@
+diff --git a/homebutler/rag/reranking.py b/homebutler/rag/reranking.py
+index 8dd13be..7e6a1b8 100644
+--- a/homebutler/rag/reranking.py
++++ b/homebutler/rag/reranking.py
+@@ -63,7 +63,7 @@ def get_reranked_retriever(base_k: int = RERANK_BASE_K,
+     else:
+         base_retriever = get_faiss_retriever(k=base_k, fetch_k=max(base_k, 20))
+ 
+-    compressor = FlashrankRerank(model=RERANK_MODEL, top_n=top_n)
++    compressor = FlashrankRerank(model=RERANK_MODEL)
+     return ContextualCompressionRetriever(
+         base_compressor=compressor,
+         base_retriever=base_retriever,

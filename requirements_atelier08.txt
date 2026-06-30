@@ -1,0 +1,12 @@
+# ─────────────────────────────────────────────────────────────────────────
+# Atelier 08 — Optimisation du pipeline RAG (module avancé, parcours industrialisation)
+# Scope : atelier 02/03 + reranking cross-encoder + multi-query + HyDE.
+# 100% local CPU (pas de GPU, pas d'API tierce pour le reranking).
+# ─────────────────────────────────────────────────────────────────────────
+
+-r requirements_atelier03.txt
+
+# ── Reranking cross-encoder (ONNX, CPU) ───────────────────────────────────
+# flashrank : modèle ms-marco-MiniLM-L-12-v2 (~34 Mo), téléchargé au 1er run,
+# tourne sur CPU (Mac ARM OK). Expose FlashrankRerank via langchain_community.
+flashrank>=0.2.9

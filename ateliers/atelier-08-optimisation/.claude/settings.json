@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "(langfuse|ragas|observabilit|tracing|llm.as.judge|azure|az search|vectorstore_azure|fine.tun|lora|finetun|fastapi|streamlit)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'SCOPE GUARD: Requête hors-scope détectée pour l\\'atelier 08. Répondre uniquement en scope (reranking cross-encoder, flashrank, multi-query, HyDE, entonnoir base_k/top_n, Recall@1/MRR).'"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+diff --git a/homebutler/rag/reranking.py b/homebutler/rag/reranking.py
+index 8dd13be..09c7f28 100644
+--- a/homebutler/rag/reranking.py
++++ b/homebutler/rag/reranking.py
+@@ -36,7 +36,7 @@ RERANK_TOP_N = int(os.getenv("RERANK_TOP_N", "5"))      # documents finaux aprè
+ # les variantes) mais de la CONSIGNE : on demande explicitement N reformulations.
+ MULTIQUERY_PROMPT = ChatPromptTemplate.from_template(
+     "Tu es un assistant qui aide à améliorer la recherche documentaire.\n"
+-    "Génère 3 reformulations DIFFÉRENTES de la question ci-dessous, afin de\n"
++    "Génère 1 reformulation DIFFÉRENTE de la question ci-dessous, afin de\n"
+     "couvrir plusieurs façons de la poser (synonymes, angle technique, angle usager).\n"
+     "Une reformulation par ligne, sans numérotation.\n\n"
+     "Question : {question}"

@@ -1,0 +1,13 @@
+diff --git a/homebutler/rag/reranking.py b/homebutler/rag/reranking.py
+index 8dd13be..116a825 100644
+--- a/homebutler/rag/reranking.py
++++ b/homebutler/rag/reranking.py
+@@ -27,7 +27,7 @@ from homebutler.rag.retriever import get_faiss_retriever, get_ensemble_retriever
+ 
+ # ─── Paramètres (surchargeables par variables d'env, défauts raisonnables) ───
+ RERANK_MODEL = os.getenv("RERANK_MODEL", "ms-marco-MiniLM-L-12-v2")
+-RERANK_BASE_K = int(os.getenv("RERANK_BASE_K", "20"))   # taille du pool de candidats
++RERANK_BASE_K = int(os.getenv("RERANK_BASE_K", "5"))   # taille du pool de candidats
+ RERANK_TOP_N = int(os.getenv("RERANK_TOP_N", "5"))      # documents finaux après reclassement
+ 
+ 
