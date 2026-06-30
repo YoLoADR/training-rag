@@ -55,18 +55,23 @@ def get_reranked_retriever(base_k: int = RERANK_BASE_K,
                        chunk) et ne garde que les `top_n` meilleurs.
 
     Concept clé — l'ENTONNOIR : `base_k` doit être nettement plus grand que `top_n`.
-    Si base_k == top_n, le reranker n'a plus rien à filtrer (il ne fait que
-    réordonner le même ensemble) et le bénéfice de précision disparaît.
-    """
-    if use_ensemble:
-        base_retriever = get_ensemble_retriever(faiss_k=base_k, chroma_k=base_k)
-    else:
-        base_retriever = get_faiss_retriever(k=base_k, fetch_k=max(base_k, 20))
+    Si base_k == top_n, le reranker n'a plus rien à filtrer.
 
-    compressor = FlashrankRerank(model=RERANK_MODEL, top_n=top_n)
-    return ContextualCompressionRetriever(
-        base_compressor=compressor,
-        base_retriever=base_retriever,
+    --- Indice léger ---
+    Deux briques LangChain : un `ContextualCompressionRetriever` qui combine un
+    `base_retriever` (étage 1) et un `base_compressor` (étage 2). Le compresseur,
+    c'est `FlashrankRerank`.
+
+    --- Indice fort ---
+    1. base_retriever = get_faiss_retriever(k=base_k, fetch_k=max(base_k, 20))
+       (ou get_ensemble_retriever(faiss_k=base_k, chroma_k=base_k) si use_ensemble)
+    2. compressor = FlashrankRerank(model=RERANK_MODEL, top_n=top_n)
+    3. return ContextualCompressionRetriever(base_compressor=compressor,
+                                             base_retriever=base_retriever)
+    """
+    raise NotImplementedError(
+        "Atelier 08 § Étape 1 — reranking cross-encoder.\n"
+        "Solution : git diff student/08-optimisation atelier/08-optimisation -- homebutler/rag/reranking.py"
     )
 
 
@@ -75,34 +80,38 @@ def get_multiquery_retriever(k: int = 4, use_ensemble: bool = False):
     MultiQueryRetriever : le LLM reformule la question en plusieurs variantes,
     on récupère pour chacune, puis on prend l'union des documents.
 
-    Utile quand le vocabulaire de l'utilisateur diverge de celui des documents
-    (ex. "ma clim" vs "VMC double flux" dans les notices).
+    Utile quand le vocabulaire de l'utilisateur diverge de celui des documents.
+
+    --- Indice léger ---
+    `MultiQueryRetriever.from_llm(...)`. La diversité vient du PROMPT (MULTIQUERY_PROMPT
+    ci-dessus), pas de la température → garde temperature=0.
+
+    --- Indice fort ---
+    base = get_faiss_retriever(k=k)   (ou ensemble si use_ensemble)
+    return MultiQueryRetriever.from_llm(retriever=base, llm=get_llm(temperature=0),
+                                        prompt=MULTIQUERY_PROMPT)
     """
-    base_retriever = (get_ensemble_retriever(faiss_k=k, chroma_k=k)
-                      if use_ensemble else get_faiss_retriever(k=k))
-    return MultiQueryRetriever.from_llm(
-        retriever=base_retriever,
-        llm=get_llm(temperature=0),
-        prompt=MULTIQUERY_PROMPT,
+    raise NotImplementedError(
+        "Atelier 08 § Étape 2 — multi-query.\n"
+        "Solution : git diff student/08-optimisation atelier/08-optimisation -- homebutler/rag/reranking.py"
     )
 
 
 def get_hyde_chain():
     """
-    HyDE (Hypothetical Document Embeddings) — chaîne LCEL.
+    HyDE (Hypothetical Document Embeddings) — chaîne LCEL (BONUS).
 
-    Idée : au lieu d'embedder la question (souvent courte), on demande au LLM de
-    GÉNÉRER une réponse hypothétique, puis on embedde CE paragraphe pour la
-    recherche vectorielle. Le paragraphe hypothétique ressemble davantage aux
-    chunks cibles que la question brute → meilleur rappel sur questions vagues.
+    Idée : au lieu d'embedder la question, on demande au LLM une réponse hypothétique
+    puis on embedde CE paragraphe pour la recherche vectorielle.
 
-    Retourne une chaîne qui transforme {question} -> paragraphe hypothétique.
-    À brancher ensuite sur `vectorstore.similarity_search(paragraphe)`.
-    """
-    hyde_prompt = ChatPromptTemplate.from_template(
-        "Rédige un court paragraphe (3-4 phrases) qui répondrait à la question\n"
-        "suivante comme s'il provenait d'une notice technique de logement.\n"
-        "N'invente pas de marque précise ; reste générique mais plausible.\n\n"
-        "Question : {question}"
-    )
+    --- Indice léger ---
+    Une chaîne LCEL : prompt | llm | StrOutputParser(). Retourne le paragraphe.
+
+    --- Indice fort ---
+    hyde_prompt = ChatPromptTemplate.from_template("Rédige un court paragraphe ... {question}")
     return hyde_prompt | get_llm(temperature=0) | StrOutputParser()
+    """
+    raise NotImplementedError(
+        "Atelier 08 § Bonus — HyDE.\n"
+        "Solution : git diff student/08-optimisation atelier/08-optimisation -- homebutler/rag/reranking.py"
+    )
