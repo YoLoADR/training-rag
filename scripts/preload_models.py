@@ -23,6 +23,16 @@ def main():
     print(f"  Test encodage : {len(test_phrases)} phrases -> {len(embeddings)} vecteurs")
     print("\nLe modèle est maintenant en cache — les prochains chargements seront instantanés.")
 
+    # ── Atelier 08 (optionnel) : pré-télécharger le reranker flashrank ────
+    # ~34 Mo ONNX, CPU. Ignoré si flashrank n'est pas installé (AT01-06).
+    try:
+        from flashrank import Ranker
+        print("\nTéléchargement du reranker flashrank (ms-marco-MiniLM-L-12-v2, ~34 Mo)...")
+        Ranker(model_name="ms-marco-MiniLM-L-12-v2")
+        print("✓ Reranker flashrank prêt (cache local).")
+    except ImportError:
+        print("\n(flashrank non installé — skip reranker, normal hors atelier 08)")
+
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,14 @@
+# ─────────────────────────────────────────────────────────────────────────
+# Atelier 07 — Observabilité & Évaluation (module avancé, parcours industrialisation)
+# Scope : atelier 05/06 + Langfuse (tracing + scoring) + RAGAS + LLM-as-judge.
+# ─────────────────────────────────────────────────────────────────────────
+
+-r requirements_atelier06.txt
+
+# ── Évaluation RAGAS (API 2026 — schéma user_input/response/retrieved_contexts/reference) ──
+# Pin STRICT : l'API 0.1.x est incompatible (colonnes différentes). On veut 0.2.x.
+ragas==0.2.15
+datasets>=2.19.0
+
+# langfuse==2.57.1 est déjà hérité via requirements_atelier05.txt (SDK v2,
+# import `from langfuse.callback import CallbackHandler`). Ne pas passer en v3/v4.

@@ -1,0 +1,13 @@
+diff --git a/homebutler/eval/judge.py b/homebutler/eval/judge.py
+index 982307d..b842a67 100644
+--- a/homebutler/eval/judge.py
++++ b/homebutler/eval/judge.py
+@@ -44,7 +44,7 @@ def llm_as_judge(question: str, answer: str, contexts) -> float:
+     `contexts` : liste de chaînes (chunks récupérés) ou une chaîne déjà formatée.
+     """
+     context = "\n\n".join(contexts) if isinstance(contexts, (list, tuple)) else str(contexts)
+-    judge = get_llm(temperature=0)  # DÉTERMINISTE — ne jamais mettre temperature > 0 ici
++    judge = get_llm(temperature=1.0)  # DÉTERMINISTE — ne jamais mettre temperature > 0 ici
+     prompt = JUDGE_PROMPT.format(question=question, context=context, answer=answer)
+     resp = judge.invoke(prompt)
+     text = resp.content if hasattr(resp, "content") else str(resp)

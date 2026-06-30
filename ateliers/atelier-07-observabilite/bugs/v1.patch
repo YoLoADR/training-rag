@@ -1,0 +1,13 @@
+diff --git a/homebutler/eval/tracing.py b/homebutler/eval/tracing.py
+index 963017b..6639578 100644
+--- a/homebutler/eval/tracing.py
++++ b/homebutler/eval/tracing.py
+@@ -27,7 +27,7 @@ def get_langfuse_handler():
+     None si les clés ne sont pas configurées."""
+     if not _keys_present():
+         return None
+-    from langfuse.callback import CallbackHandler  # SDK v2 (ne pas utiliser l'API v3)
++    from langfuse.langchain import CallbackHandler  # SDK v2 (ne pas utiliser l'API v3)
+     return CallbackHandler(
+         public_key=config.LANGFUSE_PUBLIC_KEY,
+         secret_key=config.LANGFUSE_SECRET_KEY,

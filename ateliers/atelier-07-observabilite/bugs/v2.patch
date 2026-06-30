@@ -1,0 +1,13 @@
+diff --git a/homebutler/eval/ragas_eval.py b/homebutler/eval/ragas_eval.py
+index 262471f..4820d02 100644
+--- a/homebutler/eval/ragas_eval.py
++++ b/homebutler/eval/ragas_eval.py
+@@ -27,7 +27,7 @@ def build_eval_dataset(samples):
+     Chaque dict : {user_input, response, retrieved_contexts, reference}.
+     """
+     from ragas import EvaluationDataset, SingleTurnSample
+-    return EvaluationDataset(samples=[SingleTurnSample(**s) for s in samples])
++    return EvaluationDataset(samples=[SingleTurnSample(**{k: v for k, v in s.items() if k != 'reference'}) for s in samples])
+ 
+ 
+ def run_ragas_eval(dataset, metrics=None) -> dict:

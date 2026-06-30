@@ -49,3 +49,6 @@ mlartifacts/
 .pytest_cache/
 htmlcov/
 .coverage
+
+# venvs de test ateliers avancés
+.venv_at0*/
