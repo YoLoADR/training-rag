@@ -1,0 +1,13 @@
+diff --git a/homebutler/rag/vectorstore_azure.py b/homebutler/rag/vectorstore_azure.py
+index 96e7b27..5e4db92 100644
+--- a/homebutler/rag/vectorstore_azure.py
++++ b/homebutler/rag/vectorstore_azure.py
+@@ -19,7 +19,7 @@ from homebutler.rag.vectorstore_faiss import get_embeddings
+ 
+ # Dimension de l'embedding fastembed paraphrase-multilingual-MiniLM-L12-v2.
+ # DOIT être égale à la dimension du champ vectoriel du schéma (sinon upload rejeté).
+-AZURE_VECTOR_DIM = 384
++AZURE_VECTOR_DIM = 1536
+ 
+ 
+ def build_index_schema(index_name: str, dim: int = AZURE_VECTOR_DIM):

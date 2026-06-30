@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "(langfuse|ragas|observabilit|llm.as.judge|rerank|flashrank|multi.query|hyde|fine.tun|lora|finetun)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'SCOPE GUARD: Requête hors-scope détectée pour l\\'atelier 09. Répondre uniquement en scope (Azure AI Search : control plane az search, data plane SDK, index vectoriel, hybrid/semantic search).'"
+          }
+        ]
+      }
+    ]
+  }
+}

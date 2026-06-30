@@ -30,9 +30,9 @@ fi
 
 ATELIER="$1"
 
-# Valider le format (01-06)
-if ! [[ "$ATELIER" =~ ^0[1-6]$ ]]; then
-  echo -e "${KO}  Argument invalide : '$ATELIER'. Attendu : 01 02 03 04 05 06"
+# Valider le format (01-09 : 01-06 + modules avancés 07/08/09)
+if ! [[ "$ATELIER" =~ ^0[1-9]$ ]]; then
+  echo -e "${KO}  Argument invalide : '$ATELIER'. Attendu : 01 02 03 04 05 06 07 08 09"
   exit 1
 fi
 
@@ -94,7 +94,7 @@ echo ""
 echo "── Données ──"
 NEEDS_PDFS=false
 case "$ATELIER" in
-  01|02|03|05|06) NEEDS_PDFS=true ;;
+  01|02|03|05|06|07|08|09) NEEDS_PDFS=true ;;
 esac
 
 if [[ "$NEEDS_PDFS" == "true" ]]; then
@@ -187,6 +187,15 @@ if [[ -f "$REQ_FILE" ]]; then
       ;;
     06)
       python -c "import anthropic, langchain, faiss, fastembed, fastapi" 2>/dev/null || IMPORT_OK=false
+      ;;
+    07)
+      python -c "import langfuse, ragas" 2>/dev/null || IMPORT_OK=false
+      ;;
+    08)
+      python -c "import langchain, faiss, fastembed, flashrank" 2>/dev/null || IMPORT_OK=false
+      ;;
+    09)
+      python -c "import langchain, fastembed; import azure.search.documents" 2>/dev/null || IMPORT_OK=false
       ;;
   esac
 

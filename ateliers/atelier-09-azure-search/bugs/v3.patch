@@ -1,0 +1,13 @@
+diff --git a/homebutler/rag/vectorstore_azure.py b/homebutler/rag/vectorstore_azure.py
+index 96e7b27..7d206f5 100644
+--- a/homebutler/rag/vectorstore_azure.py
++++ b/homebutler/rag/vectorstore_azure.py
+@@ -38,7 +38,7 @@ def build_index_schema(index_name: str, dim: int = AZURE_VECTOR_DIM):
+     # contre cet index pré-créé. `metadata` stocke source/page en JSON.
+     fields = [
+         SimpleField(name="id", type=SearchFieldDataType.String, key=True),
+-        SearchField(name="content", type=SearchFieldDataType.String, searchable=True),
++        SearchField(name="content", type=SearchFieldDataType.String, searchable=False),
+         SearchField(
+             name="content_vector",
+             type=SearchFieldDataType.Collection(SearchFieldDataType.Single),

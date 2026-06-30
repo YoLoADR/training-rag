@@ -35,6 +35,12 @@ API_HOST: str = os.getenv("API_HOST", "0.0.0.0")
 API_PORT: int = int(os.getenv("API_PORT", "8000"))
 API_KEY: str = os.getenv("API_KEY", "homebutler-dev-key")
 
+# ── Azure AI Search (Atelier 09 — module avancé, optionnel) ────────────────────
+# Vides par défaut : n'impacte aucun autre atelier. Renseignés via azure_provision.sh.
+AZURE_SEARCH_ENDPOINT: str = os.getenv("AZURE_SEARCH_ENDPOINT", "")
+AZURE_SEARCH_KEY: str = os.getenv("AZURE_SEARCH_KEY", "")
+AZURE_SEARCH_INDEX: str = os.getenv("AZURE_SEARCH_INDEX", "homebutler-index")
+
 # Propagate LangSmith env vars if tracing enabled
 if LANGCHAIN_TRACING_V2:
     os.environ["LANGCHAIN_TRACING_V2"] = "true"

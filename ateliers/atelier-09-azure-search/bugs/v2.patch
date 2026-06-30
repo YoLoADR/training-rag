@@ -1,0 +1,13 @@
+diff --git a/homebutler/rag/vectorstore_azure.py b/homebutler/rag/vectorstore_azure.py
+index 96e7b27..3b85a9e 100644
+--- a/homebutler/rag/vectorstore_azure.py
++++ b/homebutler/rag/vectorstore_azure.py
+@@ -73,7 +73,7 @@ def create_index(index_name: str | None = None) -> None:
+     client.create_or_update_index(build_index_schema(index_name))
+ 
+ 
+-def get_azure_store(index_name: str | None = None, search_type: str = "hybrid"):
++def get_azure_store(index_name: str | None = None, search_type: str = "similarity"):
+     """DATA PLANE — vector store LangChain branché sur l'index Azure existant.
+ 
+     search_type ∈ {"similarity", "hybrid", "semantic_hybrid"}. "hybrid" (BM25 + vecteurs,

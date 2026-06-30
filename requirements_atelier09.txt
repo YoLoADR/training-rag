@@ -1,0 +1,14 @@
+# ─────────────────────────────────────────────────────────────────────────
+# Atelier 09 — Azure AI Search (module avancé, parcours industrialisation)
+# Scope : atelier 05 + vector store managé Azure (data plane SDK).
+# Pré-requis SYSTÈME : Azure CLI (`az`) + un compte Azure (control plane).
+# ─────────────────────────────────────────────────────────────────────────
+
+-r requirements_atelier05.txt
+
+# ── Azure AI Search (data plane : index, ingestion, requêtes) ─────────────
+azure-search-documents>=11.5.1
+azure-identity>=1.16.0
+
+# Embeddings : fastembed (384d) déjà présent via la chaîne d'héritage (AT02).
+# Aucune dépendance Azure OpenAI requise → 0 coût token.
