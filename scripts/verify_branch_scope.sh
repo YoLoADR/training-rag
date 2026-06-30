@@ -131,6 +131,24 @@ case "$BRANCH" in
     fi
     ;;
 
+  atelier/07*|student/07*)
+    blue "Atelier 07 — Observabilité & Éval (pas de reranking AT08 / Azure AT09)"
+    forbid_file homebutler/rag/reranking.py
+    forbid_file homebutler/rag/vectorstore_azure.py
+    ;;
+
+  atelier/08*|student/08*)
+    blue "Atelier 08 — Optimisation pipeline (pas d'éval AT07 / Azure AT09)"
+    forbid_dir homebutler/eval
+    forbid_file homebutler/rag/vectorstore_azure.py
+    ;;
+
+  atelier/09*|student/09*)
+    blue "Atelier 09 — Azure AI Search (pas d'éval AT07 / reranking AT08)"
+    forbid_dir homebutler/eval
+    forbid_file homebutler/rag/reranking.py
+    ;;
+
   solution/*)
     blue "Branche solution — lecture seule, pas de vérification scope"
     ok "Branche solution : accès réservé post-atelier"
