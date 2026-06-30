@@ -21,39 +21,34 @@ from homebutler.rag.vectorstore_faiss import get_embeddings
 # DOIT être égale à la dimension du champ vectoriel du schéma (sinon upload rejeté).
 AZURE_VECTOR_DIM = 384
 
+_DIFF = ("Solution : git diff student/09-azure-search atelier/09-azure-search "
+         "-- homebutler/rag/vectorstore_azure.py")
+
 
 def build_index_schema(index_name: str, dim: int = AZURE_VECTOR_DIM):
     """DATA PLANE — construit le schéma de l'index vectoriel (objet, hors-ligne).
 
-    Champs : id (clé), content (texte recherchable BM25), content_vector (vecteur `dim`),
-    source/page (métadonnées). `content` DOIT être searchable=True pour la recherche hybride
-    (BM25 + vecteurs) ; `content_vector` porte la dimension qui doit matcher l'embedding.
-    """
-    from azure.search.documents.indexes.models import (
-        SearchIndex, SimpleField, SearchableField, SearchField, SearchFieldDataType,
-        VectorSearch, VectorSearchProfile, HnswAlgorithmConfiguration,
-    )
-    # Noms de champs alignés sur le connecteur LangChain AzureSearch
-    # (id / content / content_vector / metadata) pour que add_documents fonctionne
-    # contre cet index pré-créé. `metadata` stocke source/page en JSON.
+    Champs alignés sur LangChain AzureSearch : id / content / content_vector / metadata.
+    `content` DOIT être searchable=True (BM25 hybride) ; `content_vector` porte la dimension
+    qui doit matcher l'embedding (384).
+
+    --- Indice léger ---
+    `SearchIndex(name=..., fields=[...], vector_search=VectorSearch(...))`.
+    Importe les modèles depuis azure.search.documents.indexes.models.
+
+    --- Indice fort ---
     fields = [
-        SimpleField(name="id", type=SearchFieldDataType.String, key=True),
-        SearchField(name="content", type=SearchFieldDataType.String, searchable=True),
-        SearchField(
-            name="content_vector",
-            type=SearchFieldDataType.Collection(SearchFieldDataType.Single),
-            searchable=True,
-            vector_search_dimensions=dim,                 # ← doit == dimension de l'embedding
-            vector_search_profile_name="hnsw-profile",
-        ),
-        SearchableField(name="metadata", type=SearchFieldDataType.String),
+      SimpleField("id", String, key=True),
+      SearchField("content", String, searchable=True),
+      SearchField("content_vector", Collection(Single), searchable=True,
+                  vector_search_dimensions=dim, vector_search_profile_name="hnsw-profile"),
+      SearchableField("metadata", String),
     ]
-    vector_search = VectorSearch(
-        algorithms=[HnswAlgorithmConfiguration(name="hnsw")],
-        profiles=[VectorSearchProfile(name="hnsw-profile",
-                                      algorithm_configuration_name="hnsw")],
-    )
+    vector_search = VectorSearch(algorithms=[HnswAlgorithmConfiguration(name="hnsw")],
+        profiles=[VectorSearchProfile(name="hnsw-profile", algorithm_configuration_name="hnsw")])
     return SearchIndex(name=index_name, fields=fields, vector_search=vector_search)
+    """
+    raise NotImplementedError("Atelier 09 § Étape 1 — schéma d'index.\n" + _DIFF)
 
 
 def get_search_index_client():
@@ -76,17 +71,20 @@ def create_index(index_name: str | None = None) -> None:
 def get_azure_store(index_name: str | None = None, search_type: str = "hybrid"):
     """DATA PLANE — vector store LangChain branché sur l'index Azure existant.
 
-    search_type ∈ {"similarity", "hybrid", "semantic_hybrid"}. "hybrid" (BM25 + vecteurs,
-    fusion RRF) est le bon défaut : il rattrape le vocabulaire divergent que le vecteur seul rate.
+    search_type ∈ {"similarity", "hybrid", "semantic_hybrid"}. "hybrid" est le bon défaut.
+
+    --- Indice léger ---
+    `from langchain_community.vectorstores.azuresearch import AzureSearch`.
+    Passe l'embedding fastembed via embedding_function.
+
+    --- Indice fort ---
+    return AzureSearch(azure_search_endpoint=config.AZURE_SEARCH_ENDPOINT,
+                       azure_search_key=config.AZURE_SEARCH_KEY,
+                       index_name=index_name or config.AZURE_SEARCH_INDEX,
+                       embedding_function=get_embeddings().embed_query,
+                       search_type=search_type)
     """
-    from langchain_community.vectorstores.azuresearch import AzureSearch
-    return AzureSearch(
-        azure_search_endpoint=config.AZURE_SEARCH_ENDPOINT,
-        azure_search_key=config.AZURE_SEARCH_KEY,
-        index_name=index_name or config.AZURE_SEARCH_INDEX,
-        embedding_function=get_embeddings().embed_query,    # fastembed 384d (local, 0 coût)
-        search_type=search_type,
-    )
+    raise NotImplementedError("Atelier 09 § Étape 2 — vector store Azure.\n" + _DIFF)
 
 
 def ingest_documents(documents, index_name: str | None = None) -> int:
@@ -98,6 +96,10 @@ def ingest_documents(documents, index_name: str | None = None) -> int:
 
 def azure_search(query: str, index_name: str | None = None, k: int = 4,
                  search_type: str = "hybrid") -> list:
-    """Requête l'index Azure et retourne des Documents LangChain."""
-    store = get_azure_store(index_name, search_type=search_type)
-    return store.similarity_search(query, k=k, search_type=search_type)
+    """Requête l'index Azure et retourne des Documents LangChain.
+
+    --- Indice fort ---
+    return get_azure_store(index_name, search_type=search_type).similarity_search(
+        query, k=k, search_type=search_type)
+    """
+    raise NotImplementedError("Atelier 09 § Étape 2 — requête Azure.\n" + _DIFF)
