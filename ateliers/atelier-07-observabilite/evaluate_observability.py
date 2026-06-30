@@ -86,34 +86,40 @@ def build_rag_chain(retriever):
 
 
 def run_and_collect(rows: list) -> list:
-    """Exécute le RAG tracé + judge, retourne les échantillons pour RAGAS."""
+    """Exécute le RAG tracé + judge, retourne les échantillons pour RAGAS.
+
+    La bibliothèque homebutler/eval/ est fournie : tu CÂBLES ses fonctions ici.
+    """
     retriever = get_faiss_retriever(k=4)
     rag_chain = build_rag_chain(retriever)
-    handler = get_langfuse_handler()         # None si pas de clés → tracing no-op
-    cfg = {"callbacks": [handler]} if handler else {}
+
+    # ─── TODO 1 — tracing : récupérer le handler Langfuse et le passer en callback ──
+    # handler = get_langfuse_handler()         # None si pas de clés → no-op
+    # cfg = {"callbacks": [handler]} if handler else {}
+    raise NotImplementedError(
+        "Atelier 07 § Étape 1-2 — câbler tracing + judge + samples.\n"
+        "Solution : git diff student/07-observabilite atelier/07-observabilite -- "
+        "ateliers/atelier-07-observabilite/evaluate_observability.py"
+    )
 
     samples = []
     for row in rows:
         q, ref = row["question"], row["reference"]
         docs = retriever.invoke(q)
         contexts = [d.page_content for d in docs]
-        answer = rag_chain.invoke(q, config=cfg)          # ← tracé dans Langfuse
+        # ─── TODO 2 — répondre en TRAÇANT (passer config=cfg) ───────────────
+        # answer = rag_chain.invoke(q, config=cfg)
 
-        # LLM-as-judge déterministe → score [0,1], poussé dans la trace
-        score = llm_as_judge(q, answer, contexts)
-        trace_id = handler.get_trace_id() if handler and hasattr(handler, "get_trace_id") else None
-        if trace_id:
-            score_trace(trace_id, name="llm_judge", value=score,
-                        comment="qualité globale (1-5 normalisé)")
+        # ─── TODO 3 — noter via llm_as_judge (déterministe) + pousser le score ─
+        # score = llm_as_judge(q, answer, contexts)
+        # trace_id = handler.get_trace_id() if handler else None
+        # if trace_id: score_trace(trace_id, name="llm_judge", value=score)
 
-        print(f"  • {q[:50]:50}  judge={score:.2f}")
-        samples.append({
-            "user_input": q,
-            "response": answer,
-            "retrieved_contexts": contexts,
-            "reference": ref,            # ← indispensable pour context_recall/precision
-        })
-    flush_traces(handler)
+        # ─── TODO 4 — collecter l'échantillon RAGAS (reference = ground truth !) ─
+        # samples.append({"user_input": q, "response": answer,
+        #                 "retrieved_contexts": contexts, "reference": ref})
+
+    # ─── TODO 5 — flush_traces(handler) (envoi asynchrone) ──────────────────
     return samples
 
 
@@ -124,6 +130,7 @@ def main() -> None:
     samples = run_and_collect(rows)
 
     print("\n═══ Évaluation RAGAS ═══")
+    # ─── TODO 6 — build_eval_dataset(samples) puis run_ragas_eval(...) ───────
     dataset = build_eval_dataset(samples)
     metrics = run_ragas_eval(dataset)
     print("─" * 50)
