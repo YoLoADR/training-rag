@@ -41,6 +41,13 @@ QA_PATH = os.path.join(config.DATA_DIR, "qa_dataset", "concierge_qa.jsonl")
 N_EVAL = 6   # petit échantillon en Core (garde-fou rate-limit) ; augmente en Bonus
 
 
+def _llm_available() -> bool:
+    """RAGAS et le LLM-as-judge font des appels LLM : on vérifie qu'un LLM est joignable."""
+    if config.LLM_PROVIDER == "anthropic":
+        return bool(config.ANTHROPIC_API_KEY)
+    return True  # ollama : supposé démarré localement
+
+
 def ensure_index() -> None:
     docs_dir = config.DOCUMENTS_DIR
     if not os.path.exists(docs_dir) or not os.listdir(docs_dir):
@@ -124,6 +131,10 @@ def run_and_collect(rows: list) -> list:
 
 
 def main() -> None:
+    if not _llm_available():
+        print("LLM non configuré — RAGAS et le LLM-as-judge nécessitent un LLM joignable.")
+        print("  → renseigne ANTHROPIC_API_KEY dans .env, ou passe LLM_PROVIDER=ollama.")
+        raise SystemExit(1)
     ensure_index()
     rows = load_eval_samples(N_EVAL)
     print(f"═══ Observabilité + judge sur {len(rows)} questions ═══")
